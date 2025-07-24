@@ -1,0 +1,133 @@
+# **---- Work In Progress ----**
+
+
+# 🚀 Blogy Project Setup Guide
+
+Welcome! This guide will walk you through setting up and running your Django project created using **django-structurator**.
+
+---
+
+## 📦 1. Set Up Virtual Environment
+
+### 🐧 Linux / macOS:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 🪟 Windows (CMD):
+```cmd
+python -m venv venv
+venv\Scripts\activate
+```
+
+### ⚠️ If Activation Fails in Windows:
+You may see an error like:
+
+```
+execution of scripts is disabled on this system
+```
+
+**Solution: Run PowerShell as Administrator and execute:**
+```powershell
+Set-ExecutionPolicy RemoteSigned
+```
+
+---
+
+## 📥 2. Install Requirements
+
+```bash
+pip install -r requirements/development.txt
+```
+
+If using production:
+```bash
+pip install -r requirements/production.txt
+```
+
+---
+
+## 🔐 3. Configure Environment Variables
+
+Copy the example file and fill in the required values:
+```bash
+cp .env.example .env
+```
+
+Open `.env` and configure:
+- `SECRET_KEY`
+- `ALLOWED_HOSTS`
+
+- `SMTP_CONFI`
+
+You can generate a secret key using:
+```bash
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+---
+
+
+## Setup Redis
+
+- Open `src/config/settings/base.py`.
+- Start Redis on your system and add location of Redis into `LOCATION` of `CACHES`.
+- Use Memurai (Redis alternative for Windows) if you have Windows.
+
+---
+
+
+## 🗄️ 4. Apply Migrations & Setup Database
+
+```bash
+python src/manage.py migrate
+```
+
+---
+
+## 👤 5. Create a Superuser
+
+```bash
+python src/manage.py createsuperuser
+```
+
+---
+
+## 🚀 6. Run the Development Server
+
+```bash
+python src/manage.py runserver
+```
+
+---
+
+
+## 7. Celery Setup
+
+### Requirements:
+- Setup Redis or RebbitMQ for message broker in `src/config/settings/base.py`.
+- Also include that broker URL to celery configuration in `src/config/settings/base.py`
+---
+
+### Running Celery
+
+```bash
+celery -A config worker -l info
+```
+If using windows (Because Celery does not support on Windows).
+```bash
+pip install eventlet
+celery -A config worker -l info -P eventlet
+```
+If using Beat Scheduler:
+```bash
+celery -A config beat -l info
+```
+
+---
+
+
+## ✅ You’re All Set!
+
+Your project is now ready for development 🚀
