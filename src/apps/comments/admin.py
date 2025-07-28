@@ -37,3 +37,59 @@ from django.contrib import admin
 from .models import *
 # Register your models here.
 
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "post", "parent", "likes", "created_at")
+    readonly_fields = ("created_at", "updated_at")
+    list_filter = ("created_at", "updated_at")
+    search_fields = ("id", "user__username", "post__title")
+    list_per_page = 30
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": ("id",),
+            },
+        ),
+        (
+            'Comment Details',
+            {
+                "fields": ("user", "post", "content", "parent", "likes"),
+            },
+        ),
+        (
+            'Important Dates',
+            {
+                "fields": ("created_at", "updated_at"),
+            },
+        ),
+    )
+
+@admin.register(CommentLike)
+class CommentLikeAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "comment", "created_at")
+    readonly_fields = ("created_at",)
+    list_filter = ("created_at",)
+    search_fields = ("id", "user__username", "comment__id")
+    list_per_page = 50
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": ("id",),
+            },
+        ),
+        (
+            'Comment Like Details',
+            {
+                "fields": ("user", "comment"),
+            },
+        ),
+        (
+            'Important Dates',
+            {
+                "fields": ("created_at",),
+            },
+        ),
+    )

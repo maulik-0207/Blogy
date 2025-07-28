@@ -43,7 +43,7 @@ class TagAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "created_at")
     readonly_fields = ("created_at",)
     list_filter = ("created_at",)
-    search_fields = ("name",)
+    search_fields = ("id", "name",)
     list_per_page = 50
     fieldsets = (
         (
@@ -71,7 +71,7 @@ class PostTagAdmin(admin.ModelAdmin):
     list_display = ("id", "post", "tag", "created_at")
     readonly_fields = ("created_at",)
     list_filter = ("tag", "created_at")
-    search_fields = ("post__title",)
+    search_fields = ("id", "post__title",)
     list_per_page = 50
     fieldsets = (
         (
@@ -99,7 +99,7 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ("id", "author", "title", "is_private", "thumbnail_preview")
     readonly_fields = ("thumbnail_preview", "created_at", "updated_at")
     list_filter = ("is_private", "is_banned","created_at", "updated_at")
-    search_fields = ("author__username", "title", "slug")
+    search_fields = ("id", "author__username", "title", "slug")
     list_per_page = 30
     fieldsets = (
         (
@@ -111,13 +111,13 @@ class PostAdmin(admin.ModelAdmin):
         (
             'Post Details',
             {
-                "fields": ("author", "slug", "title", "content", "table_of_content", "thumbnail_preview", "thumbnail", "tags", "read_time"),
+                "fields": ("author", "slug", "title", "content", "table_of_content", "thumbnail_preview", "thumbnail", "read_time"),
             },
         ),
         (
             'Post Stats',
             {
-                "fields": ("likes", "comments"),
+                "fields": ("likes_count", "comments_count"),
             },
         ),
         (
@@ -139,7 +139,7 @@ class PostLikeAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "post", "created_at")
     readonly_fields = ("created_at",)
     list_filter = ("created_at",)
-    search_fields = ("user__username", "post__slug")
+    search_fields = ("id", "user__username", "post__slug")
     list_per_page = 50
     fieldsets = (
         (
@@ -167,7 +167,7 @@ class PostViewAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "post", "ip_address", "user_agent", "created_at")
     readonly_fields = ("created_at",)
     list_filter = ("created_at",)
-    search_fields = ("ip_address", "user_agent", "user__username", "post__slug")
+    search_fields = ("id", "ip_address", "user_agent", "user__username", "post__slug")
     list_per_page = 50
     fieldsets = (
         (
@@ -180,6 +180,34 @@ class PostViewAdmin(admin.ModelAdmin):
             'Post View Details',
             {
                 "fields": ("user", "post", "ip_address", "user_agent"),
+            },
+        ),
+        (
+            'Important Dates',
+            {
+                "fields": ("created_at",),
+            },
+        ),
+    )
+
+@admin.register(PostImage)
+class PostImageAdmin(admin.ModelAdmin):
+    list_display = ("id", "post", "image_preview", "created_at")
+    readonly_fields = ("created_at", "image_preview")
+    list_filter = ("created_at",)
+    search_fields = ("id", "post__title", "post__slug")
+    list_per_page = 50
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": ("id",),
+            },
+        ),
+        (
+            'Post Image Details',
+            {
+                "fields": ("post", "image_preview", "image"),
             },
         ),
         (

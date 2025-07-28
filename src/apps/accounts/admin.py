@@ -41,10 +41,10 @@ from django.contrib.auth.admin import UserAdmin
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    list_display = ("id", "username", "email", "profile_image_preview", "followers", "followings", "is_verified")
+    list_display = ("id", "username", "email", "profile_image_preview", "followers_count", "followings_count", "is_verified")
     readonly_fields = ("profile_image_preview", "date_joined", "last_login")
     list_filter = ("is_active", "is_staff", "is_superuser", "is_verified", "is_banned", "date_joined", "last_login")
-    search_fields = ("username", "email", "name")
+    search_fields = ("id", "username", "email", "name")
     list_per_page = 30
     fieldsets = (
         (
@@ -56,7 +56,7 @@ class CustomUserAdmin(UserAdmin):
         (
             'User Details',
             {
-                "fields": ("username", "email", "name", "profile_image_preview", "profile_image", "bio", "followers", "followings", "password"),
+                "fields": ("username", "email", "name", "profile_image_preview", "profile_image", "bio", "followers_count", "followings_count"),
             },
         ),
         (
@@ -90,6 +90,7 @@ class UserFollowAdmin(admin.ModelAdmin):
     list_display = ("id", "follower", "following", "created_at")
     readonly_fields = ("created_at",)
     list_filter = ("created_at",)
+    search_fields = ("id", "follower__username")
     list_per_page = 30
     fieldsets = (
         (

@@ -39,3 +39,19 @@ def post_thumbnail_validator(image):
             f".{extension} extension is not allowed.",
             code='invalid_image_extension',
         )
+
+def post_image_validator(image):
+    extension = image.name.split('.')[-1]
+    
+    if image.size > settings.POST_IMAGE_MAX_SIZE:
+        mb=settings.POST_IMAGE_MAX_SIZE/1000000
+        raise ValidationError(
+            f"Image size must be less than {mb}MB.",
+            code='invalid_image_size',
+        )
+    
+    if extension not in settings.POST_IMAGE_ALLOWED_EXTENSIONS:
+        raise ValidationError(
+            f".{extension} extension is not allowed.",
+            code='invalid_image_extension',
+        )

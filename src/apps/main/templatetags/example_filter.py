@@ -1,0 +1,20 @@
+"""
+---> Simple Filter <---
+@register.filter
+def to_uppercase(value): # Use -> {{ some_variable|to_uppercase }}
+    if not isinstance(value, str):
+        return value
+    return value.upper()
+    
+
+---> Filter with Arguments <---
+@register.filter
+def truncate_chars(value, num_chars): # Use -> {{ some_variable|truncate_chars:10 }}
+    if not isinstance(value, str) or not isinstance(num_chars, int):
+        return value
+    return value[:num_chars] + "..." if len(value) > num_chars else value
+"""
+from django import template
+
+register = template.Library()
+

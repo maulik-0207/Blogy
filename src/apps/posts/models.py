@@ -47,8 +47,8 @@ from uuid import uuid4
 from django.db import models
 from django.utils.html import mark_safe
 from django.contrib.auth import get_user_model
-from .helper_func import get_post_thumbnail_path
-from .validators import post_thumbnail_validator
+from .helper_func import get_post_thumbnail_path, get_post_image_path
+from .validators import post_thumbnail_validator, post_image_validator
 from django.core.exceptions import ValidationError
 # Create your models here.
 
@@ -185,12 +185,12 @@ class Post(models.Model):
         blank = True,
     )
     
-    likes = models.PositiveIntegerField(
+    likes_count = models.PositiveIntegerField(
         default= 0,
         verbose_name= "Likes",
     )
     
-    comments = models.PositiveIntegerField(
+    comments_count = models.PositiveIntegerField(
         default= 0,
         verbose_name= "Comments",
     )
@@ -329,4 +329,50 @@ class PostView(models.Model):
     class Meta:
         verbose_name = "Post View"
         verbose_name_plural = "Post Views"
+        ordering = ["-created_at",]
+
+class PostImage(models.Model):
+    
+    id = models.UUIDField(
+        default= uuid4,
+        primary_key= True,
+        unique= True,
+        null= False,
+        blank= False,
+        verbose_name= "ID",        
+    )
+    
+    post = models.ForeignKey(
+        to= Post,
+        on_delete= models.CASCADE,
+        verbose_name= "Post",
+        related_name= "post_images"
+    )
+    
+    image = models.ImageField(
+        upload_to=get_post_image_path,
+        blank=True,
+        null=True, 
+        validators=[post_image_validator],
+        verbose_name="Post Image",
+    )
+    
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name= "Created At"
+    )
+    
+    @property
+    def image_preview(self):
+        if self.image:
+            return mark_safe(f'<img src="/media/{self.image}" width="150" />')
+        else:
+            return mark_safe("<p>No Image.</p>")
+    
+    def __str__(self) -> str:
+        return f"{self.post.title} | {self.id}"
+    
+    class Meta:
+        verbose_name = "Post Image"
+        verbose_name_plural = "Post Images"
         ordering = ["-created_at",]

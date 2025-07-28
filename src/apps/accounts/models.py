@@ -111,12 +111,12 @@ class User(AbstractUser):
         max_length= 3000,
     )
     
-    followers = models.PositiveIntegerField(
+    followers_count = models.PositiveIntegerField(
         default= 0,
         verbose_name= "Followers",
     )
     
-    followings = models.PositiveIntegerField(
+    followings_count = models.PositiveIntegerField(
         default= 0,
         verbose_name= "Followings",
     )

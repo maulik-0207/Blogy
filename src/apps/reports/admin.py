@@ -37,3 +37,105 @@ from django.contrib import admin
 from .models import *
 # Register your models here.
 
+
+@admin.register(UserReport)
+class UserReportAdmin(admin.ModelAdmin):
+    list_display = ("id", "reported_by", "reported_to", "subject", "is_reviewed")
+    readonly_fields = ("created_at", "updated_at")
+    list_filter = ("is_reviewed", "created_at", "updated_at")
+    search_fields = ("id", "subject", "reported_to__username")
+    list_per_page = 30
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": ("id",),
+            },
+        ),
+        (
+            'User Report Details',
+            {
+                "fields": ("reported_by", "reported_to", "subject", "description"),
+            },
+        ),
+        (
+            'Report Review',
+            {
+                "fields": ("is_reviewed", "reviewed_by", "action"),
+            },
+        ),
+        (
+            'Important Dates',
+            {
+                "fields": ("created_at", "updated_at"),
+            },
+        ),
+    )
+
+@admin.register(PostReport)
+class PostReportAdmin(admin.ModelAdmin):
+    list_display = ("id", "reported_by", "reported_post", "subject", "is_reviewed")
+    readonly_fields = ("created_at", "updated_at")
+    list_filter = ("is_reviewed", "created_at", "updated_at")
+    search_fields = ("id", "subject", "reported_post__id")
+    list_per_page = 30
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": ("id",),
+            },
+        ),
+        (
+            'User Report Details',
+            {
+                "fields": ("reported_by", "reported_post", "subject", "description"),
+            },
+        ),
+        (
+            'Report Review',
+            {
+                "fields": ("is_reviewed", "reviewed_by", "action"),
+            },
+        ),
+        (
+            'Important Dates',
+            {
+                "fields": ("created_at", "updated_at"),
+            },
+        ),
+    )
+    
+@admin.register(CommentReport)
+class CommentReportAdmin(admin.ModelAdmin):
+    list_display = ("id", "reported_by", "reported_comment", "subject", "is_reviewed")
+    readonly_fields = ("created_at", "updated_at")
+    list_filter = ("is_reviewed", "created_at", "updated_at")
+    search_fields = ("id", "subject", "reported_comment__id")
+    list_per_page = 30
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": ("id",),
+            },
+        ),
+        (
+            'User Report Details',
+            {
+                "fields": ("reported_by", "reported_comment", "subject", "description"),
+            },
+        ),
+        (
+            'Report Review',
+            {
+                "fields": ("is_reviewed", "reviewed_by", "action"),
+            },
+        ),
+        (
+            'Important Dates',
+            {
+                "fields": ("created_at", "updated_at"),
+            },
+        ),
+    )

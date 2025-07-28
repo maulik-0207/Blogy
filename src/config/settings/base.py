@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'apps.main',
     'apps.accounts',
     'apps.posts',
     'apps.comments',
@@ -84,7 +85,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 # {{ MEDIA_URL }}
-                # 'django.template.context_processors.media',
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -142,14 +143,14 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
 ]
 
-# AUTH_USER_MODEL = "AppName.ModelName"
+AUTH_USER_MODEL = "accounts.User"
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2.4/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC' # India: Asia/Kolkata
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
