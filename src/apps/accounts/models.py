@@ -109,6 +109,8 @@ class User(AbstractUser):
     bio = models.TextField(
         verbose_name= "Bio",
         max_length= 3000,
+        blank= True,
+        null= True
     )
     
     followers_count = models.PositiveIntegerField(

@@ -21,5 +21,22 @@ Execution Methods:
         fetch_data.apply_async(countdown=10) # Executes after 10 seconds
 """
 from celery import shared_task
+from common.helpers import send_email
 # Create your tasks here.
 
+@shared_task(bind=True, max_retries=3) 
+def send_verification_link(self, request, username, email, uuid):
+    try:
+        send_email(
+            "Verify your Blogy account.",
+            {
+                "request" : request,
+                "username" : username,
+                "email" : email,
+                "uuid" : uuid
+            },
+            "accounts/emails/verification_link.html",
+            [email]
+        )
+    except Exception as exc:
+        self.retry(exc=exc, countdown=2**self.request.retries)

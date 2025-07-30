@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<!-- This heading is from register.html  -->
+{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-sm p-4" style="width: 100%; max-width: 400px;">
+        <h3 class="text-center mb-4">Register</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" name="username" id="username" placeholder="Enter your username">
+                <p class="text-danger">{{form.username.errors.0}}</p>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="text" class="form-control" name="email" id="email" placeholder="Enter your email">
+                <p class="text-danger">{{form.email.errors.0}}</p>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" name="password" id="password" placeholder="Enter your password">
+                <p class="text-danger">{{form.password.errors.0}}</p>
+            </div>
+            <div class="mb-3">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" name="confirm_password" id="confirm_password" placeholder="Enter your Password Again">
+                <p class="text-danger">{{form.confirm_password.errors.0}}</p>
+            </div>
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-primary">Register</button>
+            </div>
+            <div class="text-center">
+                <span class="small">Already have an account? </span><a href="{% url 'accounts:login' %}" class="small">Login</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from register.html  -->
+{% endblock %}

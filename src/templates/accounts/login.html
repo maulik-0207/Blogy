@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<!-- This heading is from login.html  -->
+{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-sm p-4" style="width: 100%; max-width: 400px;">
+        <h3 class="text-center mb-4">Login</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" name="username" id="username" placeholder="Enter your username">
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" name="password" id="password" placeholder="Enter your password">
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a href="#" class="small">Forgot password?</a>
+            </div>
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+            <div class="text-center">
+                <span class="small">Don't have an account? </span><a href="{% url 'accounts:register' %}" class="small">Register</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from login.html  -->
+{% endblock %}
