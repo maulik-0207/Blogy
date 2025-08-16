@@ -55,7 +55,7 @@ class RegisterForm(forms.ModelForm):
     confirm_password = forms.CharField()
     class Meta:
         model = get_user_model()
-        fields = ["username","email","password","confirm_password"]
+        fields = ["username", "email", "password", "confirm_password"]
         
     def clean(self):
         cleaned_data = super(RegisterForm, self).clean()
@@ -79,4 +79,64 @@ class RegisterForm(forms.ModelForm):
         user_obj.uuid = uuid.uuid4()
         user_obj.set_password(password)
         user_obj.save()
-        send_verification_link(request, username, email, user_obj.uuid)
+        send_verification_link.delay(request.scheme, request.get_host(), username, email, user_obj.uuid)
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = get_user_model()
+        fields = ["username", "name", "profile_image", "bio"]
+        widgets = {
+            'username': forms.TextInput(attrs= {"class" : "form-control"}),
+            'name': forms.TextInput(attrs= {"class" : "form-control"}),
+            'profile_image': forms.FileInput(attrs= {"class" : "form-control"}),
+            'bio': forms.Textarea(attrs= {"class" : "form-control"})
+        }
+
+class ResetPasswordForm(forms.Form):
+    
+    password = forms.CharField(
+        widget= forms.PasswordInput(attrs={"class": "form-control", "placeholder":"Password"}),
+        validators=[validate_password,],
+        required= True,
+    )
+    confirm_password = forms.CharField(
+        widget= forms.PasswordInput(attrs={"class": "form-control", "placeholder":"Confirm Password"}),
+        required= True,
+    )
+    
+    def clean(self):
+        cleaned_data = super(ResetPasswordForm, self).clean()
+        password = cleaned_data.get("password")
+        confirm_password = cleaned_data.get("confirm_password")
+        if not self.has_error("password"):
+            if password != confirm_password:
+                self.add_error('confirm_password',"Password and Confirm Password do not match.")
+        return cleaned_data
+
+class ChangePasswordForm(forms.Form):
+    
+    current_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={"class" : "form-control", "placeholder":"Current Password"}),
+        required= True
+    )
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder":"New Password"}),
+        required= True,
+        validators=[validate_password,],
+    )
+    confirm_new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder":"Confirm New Password"}),
+        required= True,
+    )
+    
+    def clean(self):
+        cleaned_data = super(ChangePasswordForm, self).clean()
+        current_password = cleaned_data.get("current_password")
+        new_password = cleaned_data.get("new_password")
+        confirm_new_password = cleaned_data.get("confirm_new_password")
+        if current_password == new_password:
+            self.add_error("new_password", "Current password and new password are same.")
+        if not self.has_error("new_password"):
+            if new_password != confirm_new_password:
+                self.add_error('confirm_new_password', "New Password and Confirm New Password do not match.")
+        return cleaned_data

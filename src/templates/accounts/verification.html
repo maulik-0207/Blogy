@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<!-- This heading is from verification.html  -->
+{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-sm p-4" style="width: 100%; max-width: 400px;">
+        <h3 class="text-center mb-4">Verify Your Account</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-grid mb-3">
+                <p><b>Username:</b> {{user.username}}</p>
+                <p><b>Email:</b> {{user.email}}</p>
+                <button type="submit" class="btn btn-primary">Verify</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from verification.html  -->
+{% endblock %}

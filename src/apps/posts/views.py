@@ -2,9 +2,9 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 
-def example_view(request):
+def create_post(request):
     
     ctx = {
-        "title": "Page Title Here",
+        "title": "Create Post | Blogy",
     }
-    return render(request, "posts/example_template.html", context= ctx)
+    return render(request, "posts/create_post.html", context= ctx)

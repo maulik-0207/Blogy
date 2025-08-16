@@ -12,14 +12,14 @@
             {% csrf_token %}
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" name="username" id="username" placeholder="Enter your username">
+                <input required type="text" class="form-control" name="username" id="username" placeholder="Enter your username">
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" name="password" id="password" placeholder="Enter your password">
+                <input required type="password" class="form-control" name="password" id="password" placeholder="Enter your password">
             </div>
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <a href="#" class="small">Forgot password?</a>
+                <a href="{% url 'accounts:forgot_password' %}" class="small">Forgot password?</a>
             </div>
             <div class="d-grid mb-3">
                 <button type="submit" class="btn btn-primary">Login</button>

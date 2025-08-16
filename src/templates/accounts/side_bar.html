@@ -1,0 +1,27 @@
+<style>
+    .aside-active {
+        font-weight: bold;
+        color: #0d6efd !important;
+    }
+</style>
+<aside class="col-md-3 mb-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="mb-3">Settings</h5>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a href="{% url 'accounts:edit_profile' %}" class="nav-link {% if request.path == '/accounts/edit-profile/' %}aside-active{% endif %}">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'accounts:change_password' %}" class="nav-link {% if request.path == '/accounts/change-password/' %}aside-active{% endif %}">Security</a>
+                </li>
+                <!-- <li class="nav-item">
+                    <a href="" class="nav-link">Notifications</a>
+                </li> -->
+                <li class="nav-item">
+                    <a href="{% url 'accounts:logout' %}" class="nav-link text-danger">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</aside>

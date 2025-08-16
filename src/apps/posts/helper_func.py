@@ -6,7 +6,7 @@ def get_post_thumbnail_path(instance, filename):
     file = filename.split(".")
     
     random_string = "".join(random.choice("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") for _ in range(8))
-    new_filename = f"Post_Thumbnail_{random_string}.{file[1]}"
+    new_filename = f"Post_Thumbnail_{random_string}.{file[-1]}"
 
     today = date.today()
 
@@ -16,7 +16,7 @@ def get_post_image_path(instance, filename):
     file = filename.split(".")
     
     random_string = "".join(random.choice("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") for _ in range(8))
-    new_filename = f"Post_Image_{random_string}.{file[1]}"
+    new_filename = f"Post_Image_{random_string}.{file[-1]}"
 
     today = date.today()
 

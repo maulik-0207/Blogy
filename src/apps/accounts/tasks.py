@@ -25,17 +25,36 @@ from common.helpers import send_email
 # Create your tasks here.
 
 @shared_task(bind=True, max_retries=3) 
-def send_verification_link(self, request, username, email, uuid):
+def send_verification_link(self, request_scheme, request_get_host, username, email, uuid):
     try:
         send_email(
             "Verify your Blogy account.",
             {
-                "request" : request,
+                "request_scheme" : request_scheme,
+                "request_get_host" : request_get_host,
                 "username" : username,
                 "email" : email,
                 "uuid" : uuid
             },
             "accounts/emails/verification_link.html",
+            [email]
+        )
+    except Exception as exc:
+        self.retry(exc=exc, countdown=2**self.request.retries)
+
+@shared_task(bind=True, max_retries=3) 
+def send_reset_password_link(self, request_scheme, request_get_host, username, email, uuid):
+    try:
+        send_email(
+            "Reset your password of Blogy account.",
+            {
+                "request_scheme" : request_scheme,
+                "request_get_host" : request_get_host,
+                "username" : username,
+                "email" : email,
+                "uuid" : uuid
+            },
+            "accounts/emails/reset_password_link.html",
             [email]
         )
     except Exception as exc:

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<!-- This heading is from create_post.html  -->
+{% endblock %}
+
+{% block content %}
+<main class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h3 class="mb-4">Create / Edit Post</h3>
+                    
+                    <!-- Title -->
+                    <div class="mb-3">
+                        <label for="postTitle" class="form-label fw-semibold">Title</label>
+                        <input type="text" class="form-control" id="postTitle" placeholder="Enter post title">
+                    </div>
+
+                    <!-- Content -->
+                    <div class="mb-3">
+                        <label for="postContent" class="form-label fw-semibold">Content</label>
+                        <div id="postContent" class="border rounded p-3 bg-light" style="min-height: 300px;">
+                            <!-- TinyMCE will be integrated here -->
+                            <p class="text-muted mb-0">Content editor will appear here...</p>
+                        </div>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="mb-3">
+                        <label for="postTags" class="form-label fw-semibold">Post Tags</label>
+                        <input type="text" class="form-control" id="postTags" placeholder="e.g. technology, coding, bootstrap">
+                        <small class="text-muted">Separate tags with commas.</small>
+                    </div>
+
+                    <!-- Thumbnail -->
+                    <div class="mb-4">
+                        <label for="postThumbnail" class="form-label fw-semibold">Thumbnail</label>
+                        <input class="form-control" type="file" id="postThumbnail" accept="image/*">
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Post</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from create_post.html  -->
+{% endblock %}

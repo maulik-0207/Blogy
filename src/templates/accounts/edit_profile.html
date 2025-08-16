@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<!-- This heading is from edit_profile.html  -->
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-5">
+    <div class="row">
+        <!-- Sidebar -->
+        {% include 'accounts/side_bar.html' %}
+
+        <!-- Main Form Area -->
+        <div class="col-md-9">
+            <div class="card shadow-sm p-4">
+                <h3 class="mb-4">Edit Profile</h3>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" id="email" disabled value="{{user.email}}" readonly class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{form.username.id_for_label}}" class="form-label">Username</label>
+                        {{ form.username }}
+                        <p class="text-danger">{{ form.username.errors.0 }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{form.name.id_for_label}}" class="form-label">Name</label>
+                        {{ form.name }}
+                        <p class="text-danger">{{ form.name.errors.0 }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{form.profile_image.id_for_label}}" class="form-label">Profile Image</label>
+                        {% if user.profile_image %}
+                            <br><img src="{{ MEDIA_URL }}{{ user.profile_image }}" class="mb-2 img-thumbnail" width="150" alt="Profile Image">
+                        {% endif %}
+                        {{ form.profile_image }}
+                        <p class="text-danger">{{ form.profile_image.errors.0 }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{form.bio.id_for_label}}" class="form-label">Bio</label>
+                        {{ form.bio }}
+                        <p class="text-danger">{{ form.bio.errors.0 }}</p>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from edit_profile.html  -->
+{% endblock %}
