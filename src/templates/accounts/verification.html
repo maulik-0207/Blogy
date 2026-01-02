@@ -5,19 +5,59 @@
 {% endblock %}
 
 {% block content %}
-<div class="container d-flex justify-content-center align-items-center vh-100">
-    <div class="card shadow-sm p-4" style="width: 100%; max-width: 400px;">
-        <h3 class="text-center mb-4">Verify Your Account</h3>
-        <form method="post">
-            {% csrf_token %}
-            <div class="d-grid mb-3">
-                <p><b>Username:</b> {{user.username}}</p>
-                <p><b>Email:</b> {{user.email}}</p>
-                <button type="submit" class="btn btn-primary">Verify</button>
+<main class="min-h-[calc(100vh-80px)] bg-gray-50 flex items-center justify-center">
+    <div class="w-full flex items-center justify-center px-4">
+        <div class="max-w-md w-full bg-white border border-gray-200 rounded-2xl shadow-sm px-8 py-10 text-center">
+
+            <!-- Icon -->
+            <div class="flex justify-center mb-6">
+                <div class="h-14 w-14 flex items-center justify-center rounded-full bg-indigo-100">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 6L9 17l-5-5" stroke="#6366F1" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
             </div>
-        </form>
+
+            <!-- Heading -->
+            <h1 class="text-2xl font-semibold text-gray-900">
+                Verify your email
+            </h1>
+
+            <p class="text-gray-500 text-sm mt-2">
+                Please confirm that the details below belong to you.
+            </p>
+
+            <!-- User info -->
+            <div class="mt-8 space-y-3 text-left text-sm">
+                <div class="flex justify-between border rounded-lg px-4 py-3 bg-gray-50">
+                    <span class="text-gray-500">Username</span>
+                    <span class="font-medium text-gray-900">{{ user.username }}</span>
+                </div>
+
+                <div class="flex justify-between border rounded-lg px-4 py-3 bg-gray-50">
+                    <span class="text-gray-500">Email</span>
+                    <span class="font-medium text-gray-900">{{ user.email }}</span>
+                </div>
+            </div>
+
+            <!-- Action -->
+            <form method="post" class="mt-8">
+                {% csrf_token %}
+                <button type="submit" class="w-full h-11 rounded-full bg-indigo-500 text-white font-medium
+                           hover:bg-indigo-600 transition cursor-pointer">
+                    Verify Account
+                </button>
+            </form>
+
+            <!-- Info -->
+            <p class="text-xs text-gray-400 mt-6 leading-relaxed">
+                If you didn’t request this verification, you can safely ignore this page.
+            </p>
+
+        </div>
     </div>
-</div>
+</main>
 {% endblock %}
 
 {% block script %}

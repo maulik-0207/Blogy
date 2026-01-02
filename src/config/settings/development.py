@@ -4,6 +4,8 @@ DEBUG = True
 
 INSTALLED_APPS += [
     'debug_toolbar',
+    "tailwind",
+    "apps.theme"
 ]
 
 MIDDLEWARE += [
@@ -13,6 +15,8 @@ MIDDLEWARE += [
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+TAILWIND_APP_NAME = "apps.theme"
 
 AUTH_PASSWORD_VALIDATORS = []
 

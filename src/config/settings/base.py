@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.2.4/ref/settings/
 from pathlib import Path
 import os
 import environ
-import logging
+from django.contrib import messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent # point to config/ folder
@@ -180,7 +180,7 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 # Celery Configuration Options
-CELERY_TIMEZONE = "UTC"
+CELERY_TIMEZONE = "Asia/Kolkata"
 CELERY_BROKER_URL =  "redis://127.0.0.1:6379"
 # django-celery-results
 CELERY_RESULT_BACKEND = 'django-db'
@@ -190,150 +190,12 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
-class LevelFilter(logging.Filter):
-    """
-    Filter logs by an exact level match (not >= like default behavior).
-    """
-    def __init__(self, level):
-        super().__init__()
-        self.level = logging._checkLevel(level)
 
-    def filter(self, record):
-        return record.levelno == self.level
-
-# Django Logger Configurations
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {name} {pathname}.{funcName}:{lineno} {message}',
-            'style': '{',
-        },
-        "django.server": {
-            "()": "django.utils.log.ServerFormatter",
-            "format": "[{server_time}] {message}",
-            "style": "{",
-        }
-    },
-    
-    'filters': {
-        "require_debug_false": {
-            "()": "django.utils.log.RequireDebugFalse",
-        },
-        "require_debug_true": {
-            "()": "django.utils.log.RequireDebugTrue",
-        },
-        'debug_filter': {
-            '()': LevelFilter,
-            'level': logging.DEBUG,
-        },
-        'info_filter': {
-            '()': LevelFilter,
-            'level': logging.INFO,
-        },
-        'warning_filter': {
-            '()': LevelFilter,
-            'level': logging.WARNING,
-        },
-        'error_filter': {
-            '()': LevelFilter,
-            'level': logging.ERROR,
-        },
-        'critical_filter': {
-            '()': LevelFilter,
-            'level': logging.CRITICAL,
-        },
-    },
-    
-    'handlers': {
-        "console": {
-            "level": "INFO",
-            "filters": ["require_debug_true"],
-            "class": "logging.StreamHandler",
-        },
-        "django.server": {
-            "level": "INFO",
-            "class": "logging.StreamHandler",
-            "formatter": "django.server",
-        },
-        'debug_file': {
-            'level': 'DEBUG',
-            'filters': ['debug_filter', 'require_debug_true'],
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR.parent.parent, 'logs', 'debug.log'),
-            'formatter': 'verbose',
-        },
-        'info_file': {
-            'level': 'INFO',
-            'filters': ['info_filter'],
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR.parent.parent, 'logs', 'info.log'),
-            'formatter': 'verbose',
-        },
-        'warning_file': {
-            'level': 'WARNING',
-            'filters': ['warning_filter'],
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR.parent.parent, 'logs', 'warning.log'),
-            'formatter': 'verbose',
-        },
-        'error_file': {
-            'level': 'ERROR',
-            'filters': ['error_filter'],
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR.parent.parent, 'logs', 'error.log'),
-            'formatter': 'verbose',
-        },
-        'critical_file': {
-            'level': 'CRITICAL',
-            'filters': ['critical_filter'],
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR.parent.parent, 'logs', 'critical.log'),
-            'formatter': 'verbose',
-        },  
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler',
-            'formatter': 'verbose',
-        },
-    },
-    
-    # 📦 Loggers
-    'loggers': {
-        'django': {
-            'handlers': [
-                'console',
-                'info_file',
-                'warning_file',
-                'error_file',
-                'critical_file',
-                'mail_admins',
-            ],
-            'level': 'INFO',
-        },
-        "django.server": {
-            "handlers": ["django.server"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        # 'LOGGER_NAME': {
-        #     'handlers': [
-        #         'debug_file',
-        #         'info_file',
-        #         'warning_file',
-        #         'error_file',
-        #         'critical_file',
-        #         'mail_admins',
-        #     ],
-        #     'level': 'DEBUG', <- Minimum Level
-        #     'propagate': False,
-        # },
-    },
+MESSAGE_TAGS = {
+    messages.INFO: "bg-white-100 border border-white-400 text-white-700",
+    messages.SUCCESS: "bg-green-100 border border-green-400 text-green-700",
+    messages.WARNING: "bg-red-100 border border-red-400 text-red-700",
 }
-
 
 # django-jazzmin configurations
 JAZZMIN_SETTINGS = {

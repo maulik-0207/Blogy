@@ -33,7 +33,7 @@ def profile_image_validator(image):
     extension = image.name.split('.')[-1]
     
     if image.size > settings.PROFILE_IMAGE_MAX_SIZE:
-        mb=settings.PROFILE_IMAGE_MAX_SIZE/1000000
+        mb= settings.PROFILE_IMAGE_MAX_SIZE/1000000
         raise ValidationError(
             f"Image size must be less than {mb}MB.",
             code='invalid_image_size',

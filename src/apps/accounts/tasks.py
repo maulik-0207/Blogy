@@ -28,7 +28,7 @@ from common.helpers import send_email
 def send_verification_link(self, request_scheme, request_get_host, username, email, uuid):
     try:
         send_email(
-            "Verify your Blogy account.",
+            "Verify Your Email at Blogy.",
             {
                 "request_scheme" : request_scheme,
                 "request_get_host" : request_get_host,

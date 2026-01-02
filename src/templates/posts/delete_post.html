@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<!-- This heading is from delete_post.html  -->
+{% endblock %}
+
+{% block content %}
+<main class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow-lg border-0">
+                <form method="post" class="card-body p-4">
+                    <h3 class="mb-4">Delete Post</h3>
+                    {% csrf_token %}
+                    <p><b>Slug: </b>{{post_obj.slug}}</p>
+                    <p><b>Title: </b>{{post_obj.title}}</p>
+                    <p><b>Read Time: </b>{{post_obj.read_time}}</p>
+                    <p><b>Likes: </b>{{post_obj.likes_count}}</p>
+                    <p><b>Comments: </b>{{post_obj.comments_count}}</p>
+                    <p><b>Visibility: </b>{% if post_obj.is_private %}Private{% else %}Public{% endif %}</p>
+                    <p class="text-danger"><b>This action Can't be un-done.</b></p>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-end gap-2">
+                        <a 
+                        {% if request.GET.back %}
+                        href="{{request.GET.back}}"
+                        {% else %} 
+                        href="{% url 'posts:edit_post' post_obj.id %}" 
+                        {% endif %}
+                        class="btn btn-outline-primary">Go back</a>
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from delete_post.html  -->
+{% endblock %}

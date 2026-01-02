@@ -5,58 +5,137 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid my-5">
-    <div class="row">
-        <!-- Sidebar -->
-        {% include 'accounts/side_bar.html' %}
+<main class="min-h-screen bg-gray-50 pt-16 pb-16 px-4">
+    <div class="w-full max-w-7xl mx-auto px-4">
 
-        <!-- Main Form Area -->
-        <div class="col-md-9">
-            <div class="card shadow-sm p-4">
-                <h3 class="mb-4">Edit Profile</h3>
-                <form method="post" enctype="multipart/form-data">
+        <!-- Settings Layout -->
+        <div class="flex flex-col md:flex-row bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+
+            <!-- SIDEBAR -->
+            {% include 'accounts/sidebar.html' %}
+
+            <!-- MAIN CONTENT -->
+            <section class="flex-1 p-8">
+
+                <!-- Header -->
+                <div class="mb-8">
+                    <h1 class="text-2xl font-semibold text-gray-900">
+                        Edit Profile
+                    </h1>
+                    <p class="text-sm text-gray-500 mt-1">
+                        Update your personal information.
+                    </p>
+                </div>
+
+                <!-- FORM -->
+                <form method="post" enctype="multipart/form-data" class="space-y-8">
                     {% csrf_token %}
-                    
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" id="email" disabled value="{{user.email}}" readonly class="form-control">
+
+                    <!-- Profile Image -->
+                    <div class="flex items-center gap-6">
+                        <div class="h-24 w-24 rounded-full overflow-hidden border bg-gray-100">
+                            {% if user.profile_image %}
+                            <img src="{{ user.profile_image.url }}" class="h-full w-full object-cover"
+                                alt="Profile image">
+                            {% else %}
+                            <div class="h-full w-full flex items-center justify-center text-gray-400 text-sm">
+                                No Image
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label for="profile_image" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg
+                      border border-gray-300 text-sm text-gray-700
+                      cursor-pointer hover:bg-gray-50 transition">
+
+                                <!-- Upload Icon -->
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 16V4M12 4L8 8M12 4L16 8" stroke="#4B5563" stroke-width="1.8"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="#4B5563"
+                                        stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+
+                                <span>Change photo</span>
+                            </label>
+
+                            <!-- Hidden Input -->
+                            <input type="file" name="profile_image" id="profile_image"
+                                accept="image/png,image/jpeg,image/jpg" class="hidden">
+                            {% if form.profile_image.errors.0 %}
+                            <p class="text-red-700 text-start">{{form.profile_image.errors.0}}</p>
+                            {% else %}
+                            <p class="text-xs text-gray-400 mt-1">
+                                JPG, JPEG or PNG. Max 2MB.
+                            </p>
+                            {% endif %}
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="{{form.username.id_for_label}}" class="form-label">Username</label>
-                        {{ form.username }}
-                        <p class="text-danger">{{ form.username.errors.0 }}</p>
+                    <!-- Basic Info -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1" for="name">
+                                Name
+                            </label>
+                            <input type="text" name="name" id="name" value="{{ form.name.value }}" class="w-full h-11 rounded-lg border border-gray-300 px-4
+                                      focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <p class="text-red-700 text-start ms-2">{{ form.name.errors.0 }}</p>
+                        </div>
+
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1" for="username">
+                                Username
+                            </label>
+                            <input type="text" name="username" id="username" value="{{ form.username.value }}" class="w-full h-11 rounded-lg border border-gray-300 px-4
+                                      focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <p class="text-red-700 text-start ms-2">{{ form.username.errors.0 }}</p>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="{{form.name.id_for_label}}" class="form-label">Name</label>
-                        {{ form.name }}
-                        <p class="text-danger">{{ form.name.errors.0 }}</p>
+                    <!-- Bio -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="bio">
+                            Bio
+                        </label>
+                        <textarea maxlength="3000" id="bio" name="bio" rows="4" class="w-full rounded-lg border border-gray-300 px-4 py-3
+                                     focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            placeholder="Tell something about yourself...">{{ form.bio.value }}</textarea>
+                        <p class="text-red-700 text-start ms-2">{{ form.bio.errors.0 }}</p>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="{{form.profile_image.id_for_label}}" class="form-label">Profile Image</label>
-                        {% if user.profile_image %}
-                            <br><img src="{{ MEDIA_URL }}{{ user.profile_image }}" class="mb-2 img-thumbnail" width="150" alt="Profile Image">
-                        {% endif %}
-                        {{ form.profile_image }}
-                        <p class="text-danger">{{ form.profile_image.errors.0 }}</p>
+                    <!-- Read-only Info -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 border rounded-xl p-4">
+                        <div>
+                            <p class="text-xs text-gray-500">Email</p>
+                            <p class="text-sm font-medium text-gray-900">{{ user.email }}</p>
+                        </div>
+
+                        <div>
+                            <p class="text-xs text-gray-500">Joined</p>
+                            <p class="text-sm font-medium text-gray-900">
+                                {{ user.date_joined|date:"M d, Y" }}
+                            </p>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="{{form.bio.id_for_label}}" class="form-label">Bio</label>
-                        {{ form.bio }}
-                        <p class="text-danger">{{ form.bio.errors.0 }}</p>
+                    <!-- Actions -->
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-8 py-2 rounded-full bg-indigo-500 text-white
+                                   hover:bg-indigo-600 transition cursor-pointer">
+                            Save Changes
+                        </button>
                     </div>
 
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
-                    </div>
                 </form>
-            </div>
+
+            </section>
         </div>
     </div>
-</div>
+</main>
 {% endblock %}
 
 {% block script %}

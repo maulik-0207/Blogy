@@ -50,6 +50,8 @@ from django.contrib.auth import get_user_model
 from .helper_func import get_post_thumbnail_path, get_post_image_path
 from .validators import post_thumbnail_validator, post_image_validator
 from django.core.exceptions import ValidationError
+from django.utils.timezone import now
+from datetime import timedelta
 # Create your models here.
 
 class Tag(models.Model):
@@ -119,7 +121,8 @@ class PostTag(models.Model):
     class Meta:
         verbose_name = "Post Tag"
         verbose_name_plural = "Post Tags"
-        ordering = ["-created_at",]
+        ordering = ["created_at",]
+        unique_together = ['post', 'tag']
 
 class Post(models.Model):
     
@@ -159,10 +162,14 @@ class Post(models.Model):
     
     content = models.TextField(
         verbose_name= "Content",
+        blank= True,
+        null= True
     )
     
     table_of_content = models.TextField(
         verbose_name= "Table Of Content",
+        blank= True,
+        null= True,
     )
     
     thumbnail = models.ImageField(
@@ -183,6 +190,7 @@ class Post(models.Model):
         verbose_name= "Read Time",
         null = True,
         blank = True,
+        default= timedelta(seconds=0)
     )
     
     likes_count = models.PositiveIntegerField(
@@ -211,7 +219,8 @@ class Post(models.Model):
     )
     
     updated_at = models.DateTimeField(
-        verbose_name= "Updated At"
+        verbose_name= "Updated At",
+        default= now,
     )
 
 

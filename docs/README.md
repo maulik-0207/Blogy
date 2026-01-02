@@ -18,7 +18,7 @@ source venv/bin/activate
 ### 🪟 Windows (CMD):
 ```cmd
 python -m venv venv
-venv\Scripts\activate
+.\venv\Scripts\activate
 ```
 
 ### ⚠️ If Activation Fails in Windows:
@@ -119,6 +119,8 @@ If using windows (Because Celery does not support on Windows).
 ```bash
 pip install eventlet
 celery -A config worker -l info -P eventlet
+# OR
+celery -A config worker -l info -P threads
 ```
 If using Beat Scheduler:
 ```bash

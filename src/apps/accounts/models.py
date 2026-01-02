@@ -46,8 +46,8 @@ class Model(models.Model):
 from uuid import uuid4
 from django.db import models
 from django.utils.html import mark_safe
-from django.core.validators import EmailValidator
-from django.core.exceptions import ValidationError
+from django.core.validators import EmailValidator, FileExtensionValidator
+# from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser
 from .helper_func import get_profile_image_path
 from .validators import username_validator, profile_image_validator
@@ -102,7 +102,7 @@ class User(AbstractUser):
         upload_to=get_profile_image_path,
         blank=True,
         null=True, 
-        validators=[profile_image_validator],
+        validators=[profile_image_validator, FileExtensionValidator(['jpg', 'jpeg', 'png'])],
         verbose_name="Profile Image"
     )
     
@@ -153,7 +153,7 @@ class User(AbstractUser):
     class Meta:
         verbose_name = "User"
         verbose_name_plural = "Users"
-        ordering = ["-date_joined",]
+        ordering = ["-date_joined"]
         
 class UserFollow(models.Model):
     
@@ -193,6 +193,11 @@ class UserFollow(models.Model):
     class Meta:
         verbose_name = "User Follow"
         verbose_name_plural = "User Follows"
-        unique_together = ["follower", "following"]
         ordering = ["-created_at",]
+        constraints =[
+            models.UniqueConstraint(
+                fields= ['follower', 'following'],
+                name= 'unique_user_follow'
+            )
+        ]
     

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<!-- This heading is from edit_post.html  -->
+{% endblock %}
+
+{% block content %}
+<main class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow-lg border-0">
+                <form method="post" class="card-body p-4" enctype="multipart/form-data">
+                    <h3 class="mb-4">Edit Post</h3>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="post_slug" class="form-label fw-semibold">Slug</label>
+                        <input type="text" id="post_slug" value="{{post_obj.slug}}" readonly class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{form.title.id_for_label}}" class="form-label fw-semibold">Title</label>
+                        {{form.title}}
+                        <p class="text-danger">{{form.title.errors.0}}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{form.content.id_for_label}}" class="form-label fw-semibold">Content</label>
+                        {{form.content}}
+                        <p class="text-danger">{{form.content.errors.0}}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{form.thumbnail.id_for_label}}" class="form-label fw-semibold">Thumbnail</label>
+                        {% if post_obj.thumbnail %}
+                        <br>
+                        <img src="{{MEDIA_URL}}{{post_obj.thumbnail}}" class="img-fluid my-2" alt="Post Thumbnail"
+                            width="500">
+                        {% endif %}
+                        {{form.thumbnail}}
+                        <p class="text-danger">{{form.thumbnail.errors.0}}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{form.tags_input.id_for_label}}" class="form-label fw-semibold">Tags</label>
+                        {{form.tags_input}}
+                        <p class="text-danger">{{form.tags_input.errors.0}}</p>
+                    </div>
+                    <div class="mb-3">
+                        {{form.is_private}}
+                        <label for="{{form.is_private.id_for_label}}"
+                            class="form-check-label ms-1 fw-semibold">Private</label>
+                        <p class="text-danger">{{form.is_private.errors.0}}</p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'posts:delete_post' post_obj.id %}?back={{request.path}}"
+                            class="btn btn-danger">Delete</a>
+                        <button type="submit" class="btn btn-primary">Save Post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from edit_post.html  -->
+<script src="{% static 'tinymce/tinymce.min.js' %}"></script>
+<script>
+    tinymce.init({
+        selector: '#{{form.content.id_for_label}}',
+        license_key: 'gpl',
+        menubar: "file edit view insert format tools table help",
+        plugins: [
+            'a11ychecker', 'accordion', 'advlist', 'anchor', 'autolink', 'autosave',
+            'charmap', 'code', 'codesample', 'directionality', 'emoticons', 'exportpdf',
+            'exportword', 'fullscreen', 'help', 'image', 'importcss', 'importword',
+            'insertdatetime', 'link', 'lists', 'markdown', 'math', 'media', 'nonbreaking',
+            'pagebreak', 'preview', 'quickbars', 'save', 'searchreplace', 'table',
+            'visualblocks', 'visualchars', 'wordcount'
+        ],
+        toolbar:
+            "undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist checklist | forecolor backcolor casechange permanentpen formatpainter removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media pageembed template link anchor codesample | a11ycheck ltr rtl | showcomments addcomment code typography",
+        autosave_interval: '30s',
+        a11y_advanced_options: 'true',
+        height: '700'
+    });
+</script>
+{% endblock %}

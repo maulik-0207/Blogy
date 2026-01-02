@@ -33,8 +33,8 @@ class ExampleInlineAdmin(admin.TabularInline):  #or admin.StackedInline
     extra = 1
     fields = ("field1", "field2")
 """
-from django.contrib import admin
 from .models import *
+from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 # Register your models here.
 
@@ -43,9 +43,10 @@ from django.contrib.auth.admin import UserAdmin
 class CustomUserAdmin(UserAdmin):
     list_display = ("id", "username", "email", "profile_image_preview", "followers_count", "followings_count", "is_verified")
     readonly_fields = ("profile_image_preview", "date_joined", "last_login")
-    list_filter = ("is_active", "is_staff", "is_superuser", "is_verified", "is_banned", "date_joined", "last_login")
+    list_filter = ("is_active", "is_superuser", "is_verified", "is_banned", "date_joined", "last_login")
     search_fields = ("id", "username", "email", "name")
     list_per_page = 30
+    ordering = ('-date_joined',)
     fieldsets = (
         (
             None,

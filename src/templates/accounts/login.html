@@ -5,31 +5,52 @@
 {% endblock %}
 
 {% block content %}
-<div class="container d-flex justify-content-center align-items-center vh-100">
-    <div class="card shadow-sm p-4" style="width: 100%; max-width: 400px;">
-        <h3 class="text-center mb-4">Login</h3>
-        <form method="post">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input required type="text" class="form-control" name="username" id="username" placeholder="Enter your username">
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input required type="password" class="form-control" name="password" id="password" placeholder="Enter your password">
-            </div>
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <a href="{% url 'accounts:forgot_password' %}" class="small">Forgot password?</a>
-            </div>
-            <div class="d-grid mb-3">
-                <button type="submit" class="btn btn-primary">Login</button>
-            </div>
-            <div class="text-center">
-                <span class="small">Don't have an account? </span><a href="{% url 'accounts:register' %}" class="small">Register</a>
-            </div>
-        </form>
-    </div>
-</div>
+<main class="min-h-[calc(100vh-80px)] flex items-center justify-center bg-gray-50">
+    <form action="{% url 'accounts:login' %}" method="post"
+        class="max-w-96 w-full text-center border border-gray-300/60 rounded-2xl px-8 bg-white">
+        {% csrf_token %}
+        <h1 class="text-gray-900 text-3xl mt-10 font-medium">Login</h1>
+        <p class="text-gray-500 text-sm mt-2">Please login in to continue</p>
+        <div
+            class="flex items-center w-full mt-10 bg-white border border-gray-300/80 h-12 rounded-full overflow-hidden pl-6 gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="#6B7280" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="12" cy="7" r="4" stroke="#6B7280" stroke-width="1.8" />
+            </svg>
+
+            <input type="text" placeholder="Username"
+                class="bg-transparent text-gray-500 placeholder-gray-500 outline-none text-sm w-full h-full" required
+                name="username" id="username">
+        </div>
+
+        <div
+            class="flex items-center mt-4 w-full bg-white border border-gray-300/80 h-12 rounded-full overflow-hidden pl-6 gap-2">
+            <svg width="13" height="17" viewBox="0 0 13 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M13 8.5c0-.938-.729-1.7-1.625-1.7h-.812V4.25C10.563 1.907 8.74 0 6.5 0S2.438 1.907 2.438 4.25V6.8h-.813C.729 6.8 0 7.562 0 8.5v6.8c0 .938.729 1.7 1.625 1.7h9.75c.896 0 1.625-.762 1.625-1.7zM4.063 4.25c0-1.406 1.093-2.55 2.437-2.55s2.438 1.144 2.438 2.55V6.8H4.061z"
+                    fill="#6B7280" />
+            </svg>
+            <input type="password" placeholder="Password"
+                class="bg-transparent text-gray-500 placeholder-gray-500 outline-none text-sm w-full h-full" required
+                name="password" id="password">
+        </div>
+        <div class="mt-5 text-left text-indigo-500">
+            <a class="text-sm" href="{% url 'accounts:forgot_password' %}">Forgot password?</a>
+        </div>
+
+        {% if request.GET.next %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+        {% endif %}
+
+        <button type="submit"
+            class="mt-2 w-full h-11 rounded-full text-white bg-indigo-500 hover:opacity-90 transition-opacity cursor-pointer">
+            Login
+        </button>
+        <p class="text-gray-500 text-sm mt-3 mb-11">Don’t have an account? <a class="text-indigo-500"
+                href="{% url 'accounts:register' %}">Register</a></p>
+    </form>
+</main>
 {% endblock %}
 
 {% block script %}

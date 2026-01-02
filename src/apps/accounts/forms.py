@@ -42,7 +42,6 @@ class ExampleModelForm(forms.ModelForm):
         pass
 """
 import uuid
-from .models import *  
 from django import forms
 from .tasks import send_verification_link
 from django.contrib.auth import get_user_model
@@ -63,7 +62,7 @@ class RegisterForm(forms.ModelForm):
         confirm_password = cleaned_data.get("confirm_password")
         if not self.has_error("password"):
             if password != confirm_password:
-                self.add_error('confirm_password',"Password and Confirm Password do not match.")
+                self.add_error('confirm_password', "Password and Confirm Password do not match.")
         return cleaned_data
     
     def save(self, request):
@@ -110,24 +109,16 @@ class ResetPasswordForm(forms.Form):
         confirm_password = cleaned_data.get("confirm_password")
         if not self.has_error("password"):
             if password != confirm_password:
-                self.add_error('confirm_password',"Password and Confirm Password do not match.")
+                self.add_error('confirm_password', "Password and Confirm Password do not match.")
         return cleaned_data
 
 class ChangePasswordForm(forms.Form):
     
-    current_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class" : "form-control", "placeholder":"Current Password"}),
-        required= True
-    )
+    current_password = forms.CharField()
     new_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder":"New Password"}),
-        required= True,
         validators=[validate_password,],
     )
-    confirm_new_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder":"Confirm New Password"}),
-        required= True,
-    )
+    confirm_new_password = forms.CharField()
     
     def clean(self):
         cleaned_data = super(ChangePasswordForm, self).clean()

@@ -2,7 +2,7 @@ from uuid import uuid4
 from django.contrib import messages
 from .tasks import send_reset_password_link
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, authenticate, login, logout
 from .forms import RegisterForm, ProfileForm, ResetPasswordForm, ChangePasswordForm
 
@@ -11,14 +11,14 @@ def login_view(request):
     if request.user.is_authenticated:
         messages.warning(request, "Already Logged in.")
         return redirect("main:home")
-    
+
     if request.method == 'POST':
         username = request.POST.get("username")
         password = request.POST.get("password")
-        
+
         user_obj = authenticate(request, username = username, password = password)
 
-        if user_obj and user_obj.is_verified == True and user_obj.is_banned == False:
+        if user_obj and user_obj.is_verified and not user_obj.is_banned:
             login(request, user_obj)
             messages.success(request, "Logged in successfully.")
             invalid_redirect_urls = [
@@ -26,11 +26,11 @@ def login_view(request):
                 '/accounts/register/',
                 '/accounts/login/',
             ]
-            if request.GET.get("next") and not request.GET.get("next") in invalid_redirect_urls:
-                return redirect(request.GET.get("next"))
+            if request.POST.get("next") and request.POST.get("next") not in invalid_redirect_urls:
+                return redirect(request.POST.get("next"))
             else:
                 return redirect("main:home")
-        elif user_obj and user_obj.is_verified == False:
+        elif user_obj and not user_obj.is_verified:
             messages.warning(request, 'Account is not verified.')
             return redirect("accounts:login")
         else:
@@ -57,7 +57,7 @@ def register(request):
         form = RegisterForm(data=request.POST)
         if form.is_valid():
             form.save(request= request)
-            messages.success(request, f"We have sent a verification link to your email.")
+            messages.success(request, "We have sent a verification link to your email.")
             return redirect("accounts:login")
     else:
         form = RegisterForm()
@@ -75,11 +75,7 @@ def verify_email(request, uuid):
     
     try:
         user_obj = get_user_model().objects.get(uuid = uuid, is_verified = False)
-    except:
-        messages.info(request, "Invalid Verification Link.")
-        return redirect("main:home")
-    
-    if not user_obj:
+    except (get_user_model().DoesNotExist, ValueError):
         messages.info(request, "Invalid Verification Link.")
         return redirect("main:home")
     
@@ -87,11 +83,11 @@ def verify_email(request, uuid):
         user_obj.is_verified = True
         user_obj.uuid = None
         user_obj.save()
-        messages.success(request, "Account verified successfully.")
+        messages.success(request, "Email verified successfully.")
         return redirect("accounts:login")
     
     ctx = {
-        "title": "Verify Account | Blogy",
+        "title": "Verify Your Email | Blogy",
         "user" : user_obj,
     }
     
@@ -127,14 +123,14 @@ def forgot_password(request):
         
         try:
             user_obj = get_user_model().objects.get(email = email, is_active = True, is_verified = True)
-        except:
+        except (get_user_model().DoesNotExist, ValueError):
             messages.info(request, "No such account with this email id.")
             return redirect("accounts:forgot_password")
         
         user_obj.uuid = uuid4()
         user_obj.save()
         send_reset_password_link.delay(request.scheme, request.get_host(), user_obj.username, user_obj.email, user_obj.uuid)
-        messages.success(request, "We have sent a reset password link to your mail.")
+        messages.success(request, "We have sent a reset password link to your email.")
         return redirect("accounts:login")
 
     ctx = {
@@ -149,7 +145,7 @@ def reset_password(request, uuid):
     
     try:
         user_obj = get_user_model().objects.get(uuid = uuid, is_active = True, is_verified = True)
-    except:
+    except (get_user_model().DoesNotExist, ValueError):
         messages.info(request, "Invalid Link.")
         return redirect("accounts:forgot_password")
     
@@ -177,7 +173,7 @@ def change_password(request):
         form = ChangePasswordForm(data=request.POST)
         if form.is_valid():
             current_password = form.cleaned_data["current_password"]
-            valid_user = authenticate(request, username = request.user.username, password =current_password )
+            valid_user = authenticate(request, username= request.user.username, password= current_password )
             if not valid_user:
                 form.add_error("current_password","Current Password is incorrect.")
             else:
