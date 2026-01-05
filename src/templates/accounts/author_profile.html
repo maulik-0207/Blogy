@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<!-- This heading is from author_profile.html  -->
+{% endblock %}
+
+{% block content %}
+<main class="min-h-screen bg-gray-50 pt-16 pb-20 px-4">
+    <div class="max-w-6xl mx-auto">
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 mb-8">
+            <div class="flex flex-col sm:flex-row gap-6 sm:items-center sm:justify-between">
+
+                <div class="flex items-center gap-4">
+                    <!-- Avatar -->
+                    {% if author.profile_image %}
+                    <img src="{{ author.profile_image.url }}" class="h-20 w-20 rounded-full object-cover border">
+                    {% else %}
+                    <div class="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                        NA
+                    </div>
+                    {% endif %}
+
+                    <!-- Info -->
+                    <div>
+                        <h1 class="text-xl font-semibold text-gray-900">
+                            {{ author.username }}
+                        </h1>
+                        {% if author.name %}
+                        <p class="text-sm text-gray-600">{{ author.name }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Stats + Action -->
+                <div class="flex items-center gap-6">
+
+                    <div class="text-center">
+                        <p class="text-lg font-semibold">{{ author.followers_count }}</p>
+                        <p class="text-xs text-gray-500">Followers</p>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="text-lg font-semibold">{{ author.followings_count }}</p>
+                        <p class="text-xs text-gray-500">Following</p>
+                    </div>
+
+                    {% if request.user.is_authenticated and request.user != author %}
+                    <form method="post" action="{% url 'accounts:toggle_follow' author.username %}">
+                        {% csrf_token %}
+                        {% if is_following %}
+                        <button
+                            class="px-4 py-2 rounded-full border border-gray-300 text-sm hover:bg-gray-100 cursor-pointer">
+                            Following
+                        </button>
+                        {% else %}
+                        <button
+                            class="px-4 py-2 rounded-full bg-indigo-500 text-white text-sm hover:bg-indigo-600 cursor-pointer">
+                            Follow
+                        </button>
+                        {% endif %}
+                    </form>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="flex flex-wrap items-center gap-3 mb-6">
+            <a href="?filter=all" class="px-4 py-2 rounded-full text-sm border
+              {% if filter == 'all' %}bg-indigo-500 text-white{% else %}bg-white{% endif %}">
+                All
+            </a>
+
+            {% if request.user.is_authenticated and request.user == author %}
+            <a href="?filter=public" class="px-4 py-2 rounded-full text-sm border
+              {% if filter == 'public' %}bg-indigo-500 text-white{% else %}bg-white{% endif %}">
+                Public
+            </a>
+            {% endif %}
+
+            <a href="?filter=popular" class="px-4 py-2 rounded-full text-sm border
+              {% if filter == 'popular' %}bg-indigo-500 text-white{% else %}bg-white{% endif %}">
+                Popular
+            </a>
+            {% if author.bio %}
+            <a href="?filter=About" class="px-4 py-2 rounded-full text-sm border
+              {% if filter == 'About' %}bg-indigo-500 text-white{% else %}bg-white{% endif %}">
+                About
+            </a>
+            {% endif %}
+        </div>
+
+        {% if filter == 'About' %}
+        <div class="mt-2 text-sm text-gray-600 max-w-xl leading-relaxed space-y-4">
+            <p class="whitespace-pre-line">
+                {{author.bio}}
+
+            </p>
+        </div>
+        {% elif page_obj %}
+        <div class="space-y-4">
+
+            {% for post in page_obj %}
+            <div class="flex gap-4 bg-white border border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition">
+
+                <!-- Thumbnail -->
+                <div class="h-20 w-32 shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                    {% if post.thumbnail %}
+                    <img src="{{ post.thumbnail.url }}" class="h-full w-full object-cover">
+                    {% else %}
+                    <div class="h-full w-full flex items-center justify-center text-xs text-gray-400">
+                        No Image
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Content -->
+                <div class="flex-1 min-w-0">
+                    <h3 class="font-medium text-gray-900 truncate">
+                        <a href="{% url 'posts:post_detail' post.slug %}">
+                            {{ post.title }}
+                        </a>
+                    </h3>
+
+                    <!-- Tags -->
+                    <div class="flex flex-wrap gap-2 mt-1">
+                        {% for pt in post.post_tags.all %}
+                        <span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full">
+                            #{{ pt.tag.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Meta -->
+                    <div class="flex items-center gap-4 text-xs text-gray-500 mt-2">
+                        <span>❤️ {{ post.likes_count }}</span>
+                        <span>💬 {{ post.comments_count }}</span>
+                        <span>{{ post.created_at|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+        {% else %}
+        <p class="text-gray-500 text-sm text-center py-20">
+            No posts available.
+        </p>
+        {% endif %}
+
+        {% if page_obj.has_other_pages %}
+        <div class="flex justify-center mt-10">
+            <nav class="flex items-center gap-2 text-sm">
+
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.filter %}&filter={{request.GET.filter}}{% endif %}"
+                    class="px-3 py-1 rounded border hover:bg-gray-100">
+                    Prev
+                </a>
+                {% endif %}
+
+                <span class="px-3 py-1 text-gray-500">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.filter %}&filter={{request.GET.filter}}{% endif %}"
+                    class="px-3 py-1 rounded border hover:bg-gray-100">
+                    Next
+                </a>
+                {% endif %}
+
+            </nav>
+        </div>
+        {% endif %}
+
+    </div>
+</main>
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from author_profile.html  -->
+{% endblock %}

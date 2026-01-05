@@ -1,30 +1,34 @@
 <aside class="w-full md:w-64 bg-gray-50 border-b md:border-b-0 md:border-r p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-6">
-                Settings
-            </h2>
+    <h2 class="text-lg font-semibold text-gray-900 mb-6">
+        Me
+    </h2>
 
-            <nav class="space-y-1 text-sm">
+    <nav class="space-y-1 text-sm">
 
-                <a href="{% url 'accounts:edit_profile' %}"
-                   class="block px-3 py-2 rounded-lg font-medium {% if request.path == '/accounts/edit-profile/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
-                    Edit Profile
-                </a>
+        <a href="{% url 'accounts:edit_profile' %}"
+            class="block px-3 py-2 rounded-lg font-medium {% if request.path == '/accounts/edit-profile/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+            Edit Profile
+        </a>
 
-                <a href="{% url 'accounts:change_password' %}"
-                   class="block px-3 py-2 rounded-lg {% if request.path == '/accounts/change-password/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
-                    Change Password
-                </a>
+        <a href="{% url 'accounts:change_password' %}"
+            class="block px-3 py-2 rounded-lg {% if request.path == '/accounts/change-password/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+            Change Password
+        </a>
 
-                <a href=""
-                   class="block px-3 py-2 rounded-lg {% if request.path == '/accounts/notifications/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
-                    Notifications
-                </a>
+        <a href="{% url 'accounts:followings' %}"
+            class="block px-3 py-2 rounded-lg {% if request.path == '/accounts/followings/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+            Followings
+        </a>
 
-                <hr class="my-4">
+        <a href="{% url 'accounts:followers' %}"
+            class="block px-3 py-2 rounded-lg {% if request.path == '/accounts/followers/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+            Followers
+        </a>
 
-                <a href="{% url 'accounts:logout' %}"
-                   class="block px-3 py-2 rounded-lg text-red-500 hover:bg-red-50">
-                    Logout
-                </a>
-            </nav>
-        </aside>
+        <hr class="my-4">
+
+        <a href="{% url 'accounts:logout' %}" class="block px-3 py-2 rounded-lg text-red-500 hover:bg-red-50">
+            Logout
+        </a>
+    </nav>
+</aside>

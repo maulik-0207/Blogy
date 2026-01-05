@@ -16,7 +16,9 @@ def pre_save_handler(sender, instance, **kwargs):
 def post_save_handler(sender, instance, created, **kwargs):
     pass
 """
-from .models import * 
+from .models import (
+    Post, PostImage
+) 
 from django.db.models.signals import (
     pre_save,
     pre_delete

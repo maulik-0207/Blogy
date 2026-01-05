@@ -49,9 +49,14 @@ from django.utils.html import mark_safe
 from django.contrib.auth import get_user_model
 from .helper_func import get_post_thumbnail_path, get_post_image_path
 from .validators import post_thumbnail_validator, post_image_validator
-from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
+from django.conf import settings
 from django.utils.timezone import now
 from datetime import timedelta
+from bs4 import BeautifulSoup
+from typing import Tuple
+import random
+from django.utils.html import escape
 # Create your models here.
 
 class Tag(models.Model):
@@ -122,7 +127,12 @@ class PostTag(models.Model):
         verbose_name = "Post Tag"
         verbose_name_plural = "Post Tags"
         ordering = ["created_at",]
-        unique_together = ['post', 'tag']
+        constraints =[
+            models.UniqueConstraint(
+                fields= ['post', 'tag'],
+                name= 'unique_post_tag'
+            )
+        ]
 
 class Post(models.Model):
     
@@ -176,7 +186,7 @@ class Post(models.Model):
         upload_to=get_post_thumbnail_path,
         blank=True,
         null=True, 
-        validators=[post_thumbnail_validator],
+        validators=[post_thumbnail_validator, FileExtensionValidator(settings.POST_THUMBNAIL_ALLOWED_EXTENSIONS)],
         verbose_name="Post Thumbnail",
     )
     
@@ -223,7 +233,120 @@ class Post(models.Model):
         default= now,
     )
 
+    def set_tags(self, tags:str):
+        old_tags = [str(tag.tag.name) for tag in self.post_tags.all()]
+        new_tags = [tag.lower().strip() for tag in tags.split(",")]
+        
+        total_tags = 0
+        for tag in new_tags:
+            if tag not in old_tags and tag != "":
+                tag_obj = Tag.objects.get_or_create(name = tag)[0]
+                PostTag.objects.create(post = self, tag= tag_obj)
+                total_tags += 1
+            elif tag in old_tags:
+                total_tags += 1
+            
+            if total_tags >= 5:
+                break
+        
+        for tag in old_tags:
+            if tag not in new_tags:
+                postTag_obj = PostTag.objects.get(post = self, tag__name = tag)
+                postTag_obj.delete()
 
+    def generate_table_of_content_html(self) -> Tuple[str, str]:
+        """
+        - Injects id into h1–h4 headings
+        - Generates HTML TOC with anchor links
+        - Returns (updated_content, toc_html)
+        """
+
+        if not self.content:
+            return self.content, ""
+
+        soup = BeautifulSoup(self.content, "html.parser")
+        headings = soup.find_all(["h1", "h2", "h3", "h4"])
+
+        if not headings:
+            return self.content, ""
+
+        toc_html = [
+            '<ul class="space-y-2 text-sm">'
+        ]
+
+        previous_level = 1
+
+        for heading in headings:
+            level = int(heading.name[1])  # h2 → 2
+            text = heading.get_text(strip=True)
+
+            if not text:
+                continue
+
+            hid  = "".join(random.choice("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") for _ in range(8))
+            heading["id"] = hid
+
+            text_escaped = escape(text)
+
+            # Nesting logic
+            while level > previous_level:
+                toc_html.append('<ul class="ml-4 space-y-1">')
+                previous_level += 1
+
+            while level < previous_level:
+                toc_html.append("</ul>")
+                previous_level -= 1
+
+            # 🎯 h2 = main tab
+            if level == 1:
+                # h1 → special
+                toc_html.append(
+                    f'''
+                    <li>
+                        <a href="#{hid}"
+                        class="block px-3 py-2 rounded-lg
+                                font-semibold text-gray-900
+                                hover:bg-indigo-50 hover:text-indigo-600">
+                            {text_escaped}
+                        </a>
+                    </li>
+                    '''
+                )
+            elif level == 2:
+                toc_html.append(
+                    f'''
+                    <li>
+                        <a href="#{hid}"
+                           class="block px-3 py-2 rounded-lg
+                                  font-medium text-gray-800
+                                  hover:bg-indigo-50 hover:text-indigo-600
+                                  transition">
+                            {text_escaped}
+                        </a>
+                    </li>
+                    '''
+                )
+            else:
+                toc_html.append(
+                    f'''
+                    <li>
+                        <a href="#{hid}"
+                           class="block px-3 py-1 text-gray-600
+                                  hover:text-indigo-600 transition">
+                            {text_escaped}
+                        </a>
+                    </li>
+                    '''
+                )
+
+        while previous_level > 2:
+            toc_html.append("</ul>")
+            previous_level -= 1
+
+        toc_html.append("</ul>")
+
+        return str(soup), "".join(toc_html)
+    
     # def clean(self):
     #     super().clean()
 
@@ -289,7 +412,12 @@ class PostLike(models.Model):
     class Meta:
         verbose_name = "Post Like"
         verbose_name_plural = "Post Likes"
-        unique_together = ['user', 'post']
+        constraints =[
+            models.UniqueConstraint(
+                fields= ['user', 'post'],
+                name= 'unique_post_like'
+            )
+        ]
         ordering = ["-created_at",]
 
 class PostView(models.Model):
@@ -362,7 +490,7 @@ class PostImage(models.Model):
         upload_to=get_post_image_path,
         blank=True,
         null=True, 
-        validators=[post_image_validator],
+        validators=[post_image_validator, FileExtensionValidator(settings.POST_IMAGE_ALLOWED_EXTENSIONS)],
         verbose_name="Post Image",
     )
     

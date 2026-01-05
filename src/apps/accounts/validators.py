@@ -30,7 +30,7 @@ def username_validator(username):
 
 def profile_image_validator(image):
     dimensions = get_image_dimensions(image)
-    extension = image.name.split('.')[-1]
+    # extension = image.name.split('.')[-1]
     
     if image.size > settings.PROFILE_IMAGE_MAX_SIZE:
         mb= settings.PROFILE_IMAGE_MAX_SIZE/1000000
@@ -51,8 +51,8 @@ def profile_image_validator(image):
             code='invalid_image_dimensions',
         )
     
-    if extension not in settings.PROFILE_IMAGE_ALLOWED_EXTENSIONS:
-        raise ValidationError(
-            f".{extension} extension is not allowed.",
-            code='invalid_image_extension',
-        )
+    # if extension not in settings.PROFILE_IMAGE_ALLOWED_EXTENSIONS:
+    #     raise ValidationError(
+    #         f".{extension} extension is not allowed.",
+    #         code='invalid_image_extension',
+    #     )

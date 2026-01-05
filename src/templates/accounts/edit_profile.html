@@ -18,13 +18,24 @@
             <section class="flex-1 p-8">
 
                 <!-- Header -->
-                <div class="mb-8">
-                    <h1 class="text-2xl font-semibold text-gray-900">
-                        Edit Profile
-                    </h1>
-                    <p class="text-sm text-gray-500 mt-1">
-                        Update your personal information.
-                    </p>
+                <div class="mb-8 flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-semibold text-gray-900">
+                            Edit Profile
+                        </h1>
+                        <p class="text-sm text-gray-500 mt-1">
+                            Update your personal information.
+                        </p>
+                    </div>
+
+                    <a target="_blank" href="{% url 'acc_public_urls:author_profile' request.user.username %}"
+                        class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        View public profile
+                        <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 3h7m0 0v7m0-7L10 14" />
+                        </svg>
+                    </a>
                 </div>
 
                 <!-- FORM -->

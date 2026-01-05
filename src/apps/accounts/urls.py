@@ -2,7 +2,8 @@ from django.urls import path
 from .views import (
     login_view, logout_view, register,
     verify_email, edit_profile, forgot_password,
-    reset_password, change_password
+    reset_password, change_password, toggle_follow,
+    followings, followers
 )
 
 app_name = "accounts"
@@ -16,4 +17,7 @@ urlpatterns = [
     path('forgot-password/', forgot_password, name='forgot_password'),
     path('reset-password/<uuid>/', reset_password, name='reset_password'),
     path('change-password/', change_password, name='change_password'),
+    path("toggle-follow/<str:username>", toggle_follow, name="toggle_follow"),
+    path("followings/", followings, name="followings"),
+    path("followers/", followers, name="followers")
 ]

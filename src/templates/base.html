@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
-{% load static tailwind_tags %}
+{% load tailwind_tags %}
 <html lang="en">
 
 <head>
@@ -27,7 +27,7 @@
     {% endfor %}
 
     <nav
-        class="flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-2 border-b border-gray-300 bg-white relative transition-all">
+        class="flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 pb-2 border-b border-gray-300 bg-white relative transition-all">
         <a href="{% url 'main:home' %}">
             <img class="h-12"
                 src="{% static 'images/blogy.png' %}"
@@ -43,7 +43,7 @@
         </button>
 
         <div id="mobile-menu"
-            class="hidden absolute top-[60px] left-0 w-full bg-white shadow-md py-4 flex-col items-start gap-2 px-5 text-sm md:hidden">
+            class="hidden absolute top-15 left-0 w-full bg-white shadow-md py-4 flex-col items-start gap-2 px-5 text-sm md:hidden">
             <a href="#" class="block">Home</a>
             <a href="#" class="block">About</a>
             <a href="{% url 'accounts:edit_profile' %}" class="block">Settings</a>
@@ -54,9 +54,9 @@
         </div>
 
         <div class="hidden sm:flex items-center gap-8">
-            <a href="#">Home</a>
-            <a href="#">About</a>
-            <a href="{% url 'accounts:edit_profile' %}">Settings</a>
+            <a href="{% url 'main:home' %}">Home</a>
+            <a href="{% url 'posts:my_posts' %}">Posts</a>
+            <a href="{% url 'accounts:edit_profile' %}">Me</a>
 
             <div class="hidden lg:flex items-center text-sm gap-2 border border-gray-300 px-3 rounded-full">
                 <input class="py-1.5 w-full bg-transparent outline-none placeholder-gray-500" type="text"

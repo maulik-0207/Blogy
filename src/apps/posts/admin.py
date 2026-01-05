@@ -34,7 +34,10 @@ class ExampleInlineAdmin(admin.TabularInline):  #or admin.StackedInline
     fields = ("field1", "field2")
 """
 from django.contrib import admin
-from .models import *
+from .models import (
+    Tag, PostTag, Post, 
+    PostLike, PostView, PostImage
+)
 # Register your models here.
 
 
@@ -73,6 +76,7 @@ class PostTagAdmin(admin.ModelAdmin):
     list_filter = ("tag", "created_at")
     search_fields = ("id", "post__title",)
     list_per_page = 50
+    ordering = ("-created_at",)
     fieldsets = (
         (
             None,

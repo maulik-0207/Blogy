@@ -42,7 +42,9 @@ class ExampleModelForm(forms.ModelForm):
         pass
 """
 from django import forms
-from .models import *  
+from .models import (
+    Post
+)
 # Create your forms here.
 
 class CreatePostForm(forms.ModelForm):
@@ -50,19 +52,10 @@ class CreatePostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ['title']
-        widgets = {
-            "title" : forms.TextInput(attrs={"class" : "form-control"})
-        }
         
 class EditPostForm(forms.ModelForm):
     
-    tags_input = forms.CharField(max_length= 500, widget= forms.TextInput(attrs={"class" : "form-control"}), required= False)
+    tags = forms.CharField(required= False)
     class Meta:
         model = Post
-        fields = ['title', 'content', 'thumbnail', 'tags_input', 'is_private']
-        widgets = {
-            "title" : forms.TextInput(attrs={"class" : "form-control"}),
-            "content" : forms.Textarea(attrs={"class" : "form-control"}),
-            "thumbnail" : forms.FileInput(attrs={"class" : "form-control"}),
-            "is_private" : forms.CheckboxInput(attrs={"class" : "form-check-input"}),
-        }
+        fields = ['title', 'content', 'thumbnail', 'tags', 'is_private']

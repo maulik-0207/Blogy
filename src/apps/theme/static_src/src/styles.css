@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
 
 /**
   * A catch-all path to Django template files, JavaScript, and Python files

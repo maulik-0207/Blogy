@@ -5,65 +5,94 @@
 {% endblock %}
 
 {% block content %}
-<div class="container my-4">
-    <h2 class="mb-4">My Posts</h2>
+<main class="min-h-screen bg-gray-50 pt-16 pb-16 px-4">
+    <div class="w-full max-w-7xl mx-auto px-4">
 
-    {% if post_objs %}
-    <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Thumbnail</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Created</th>
-                    <th scope="col">Visibility</th>
-                    <th scope="col">Likes</th>
-                    <th scope="col" class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for post_obj in post_objs %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    
-                    <td>
-                        {% if post_obj.thumbnail %}
-                            <img src="{{ post_obj.thumbnail.url }}" alt="{{ post_obj.title }}"
-                                 class="img-thumbnail" style="width: 80px; height: auto;">
-                        {% endif %}
-                    </td>
-                    
-                    <td class="col-6">
-                        <a href="{% url 'posts:edit_post' post_obj.id %}" class="fw-semibold text-decoration-none">
-                            {{ post_obj.title }}
-                        </a>
-                    </td>
-                    
-                    <td>{{ post_obj.created_at|date:"M d, Y" }}</td>
-                    
-                    <td>
-                        {% if post_obj.is_private %}
-                        <span class="badge bg-warning text-dark">Private</span>
-                        {% else %}
-                        <span class="badge bg-success">Public</span>
-                        {% endif %}
-                    </td>
-                    <td>{{ post_obj.likes_count }}</td>
-                    
-                    <td class="text-end">
-                        <a href="{% url 'posts:edit_post' post_obj.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
-                        <a href="{% url 'posts:delete_post' post_obj.id %}?back={{request.path}}" class="btn btn-sm btn-outline-danger">Delete</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="flex flex-col md:flex-row bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+
+            <!-- SIDEBAR -->
+            {% include 'posts/sidebar.html' %}
+
+            <!-- MAIN CONTENT -->
+            <section class="flex-1 p-8">
+
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h1 class="text-2xl font-semibold text-gray-900">
+                            My Posts
+                        </h1>
+                    </div>
+                </div>
+
+                <!-- POSTS LIST -->
+                {% if post_objs %}
+                <div class="space-y-4">
+                    {% for post_obj in post_objs %}
+                    <div class="flex items-center gap-6 border rounded-xl px-6 py-4 hover:bg-gray-50">
+
+                        <!-- THUMBNAIL -->
+                        <div class="w-28 aspect-video shrink-0 rounded-lg overflow-hidden bg-gray-100 border">
+                            {% if post_obj.thumbnail %}
+                            <img src="{{ post_obj.thumbnail.url }}" class="h-full w-full object-cover"
+                                alt="Post thumbnail">
+                            {% else %}
+                            <div class="h-full w-full flex items-center justify-center text-xs text-gray-400">
+                                No Image
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- CONTENT -->
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-base font-medium text-gray-900 truncate">
+                                <a target="_blank" href="{% url 'posts:post_detail' post_obj.slug %}">{{ post_obj.title|truncatechars:65 }}</a>
+                            </h3>
+
+                            <div class="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                                <span>{{ post_obj.created_at|date:"M d, Y" }}</span>
+
+                                {% if post_obj.is_banned %}
+                                <span class="px-2 py-0.5 rounded-full bg-red-100 text-red-600 font-medium">Banned</span>
+                                {% elif post_obj.is_private %}
+                                <span
+                                    class="px-2 py-0.5 rounded-full bg-gray-200 text-gray-700 font-medium">Private</span>
+                                {% else %}
+                                <span
+                                    class="px-2 py-0.5 rounded-full bg-green-100 text-green-600 font-medium">Public</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- ACTIONS -->
+                        <div class="flex items-center gap-4 text-sm whitespace-nowrap">
+                            {% if not post_obj.is_banned %}
+                            <a href="{% url 'posts:edit_post' post_obj.id %}" class="text-gray-600 hover:text-gray-900">Edit</a>
+                            {% endif %}
+                            <a href="{% url 'posts:delete_post' post_obj.id %}?back={{request.path}}" class="text-red-500 hover:text-red-600">Delete</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+
+                <!-- EMPTY STATE -->
+                <div class="text-center py-20">
+                    <p class="text-gray-500 text-sm">
+                        You haven’t created any posts yet.
+                    </p>
+                    <a href="{% url 'posts:create_post' %}" class="inline-block mt-4 px-6 py-2 rounded-full bg-indigo-500 text-white
+                              hover:bg-indigo-600 transition text-sm">
+                        Create your first post
+                    </a>
+                </div>
+
+                {% endif %}
+
+            </section>
+        </div>
     </div>
-    {% else %}
-        <p class="text-muted">You haven’t created any posts yet.</p>
-    {% endif %}
-</div>
+</main>
 
 {% endblock %}
 

@@ -5,27 +5,53 @@
 {% endblock %}
 
 {% block content %}
-<main class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10">
-            <div class="card shadow-lg border-0">
-                <form method="post" class="card-body p-4">
-                    <h3 class="mb-4">Create New Post</h3>
+<main class="min-h-screen bg-gray-50 pt-16 pb-16 px-4">
+    <div class="w-full max-w-7xl mx-auto px-4">
+
+        <!-- Settings Layout -->
+        <div class="flex flex-col md:flex-row bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+
+            <!-- SIDEBAR -->
+            {% include 'posts/sidebar.html' %}
+
+            <!-- MAIN CONTENT -->
+            <section class="flex-1 p-8">
+
+                <!-- Header -->
+                <div class="mb-8">
+                    <h1 class="text-2xl font-semibold text-gray-900">
+                        Create New Post
+                    </h1>
+                    <!-- <p class="text-sm text-gray-500 mt-1">
+                        Update your personal information.
+                    </p> -->
+                </div>
+
+                <!-- FORM -->
+                <form method="post" class="space-y-8">
                     {% csrf_token %}
-                    <!-- Title -->
-                    <div class="mb-3">
-                        <label for="{{form.title.id_for_label}}" class="form-label fw-semibold">Title</label>
-                        {{form.title}}
-                        <p class="text-danger">{{form.title.errors.0}}</p>
+
+                    <!-- Bio -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="title">
+                            Title
+                        </label>
+                        <input required maxlength="160" type="text" name="title" id="title" value="{{ form.title.value|default_if_none:'' }}" class="w-full h-11 rounded-lg border border-gray-300 px-4
+                                      focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <p class="text-red-700 text-start ms-2">{{ form.title.errors.0 }}</p>
                     </div>
 
-                    <!-- Action Buttons -->
-                    <div class="d-flex justify-content-end gap-2">
-                        <a href="{% url 'main:home' %}" class="btn btn-secondary">Cancel</a>
-                        <button type="submit" class="btn btn-primary">Create Post</button>
+                    <!-- Actions -->
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-8 py-2 rounded-full bg-indigo-500 text-white
+                                   hover:bg-indigo-600 transition cursor-pointer">
+                            Create
+                        </button>
                     </div>
+
                 </form>
-            </div>
+
+            </section>
         </div>
     </div>
 </main>

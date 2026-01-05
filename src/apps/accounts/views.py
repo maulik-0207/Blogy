@@ -2,10 +2,12 @@ from uuid import uuid4
 from django.contrib import messages
 from .tasks import send_reset_password_link
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model, authenticate, login, logout
 from .forms import RegisterForm, ProfileForm, ResetPasswordForm, ChangePasswordForm
-
+from django.core.paginator import Paginator
+from apps.posts.models import Post
+from .models import UserFollow
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -190,3 +192,138 @@ def change_password(request):
         "form" : form,
     }
     return render(request, "accounts/change_password.html", context=ctx)
+
+def author_profile(request, username):
+    author = get_object_or_404(
+        get_user_model(),
+        username=username,
+        is_active=True,
+        is_verified = True,
+        is_banned = False
+    )
+
+    is_following = request.user.is_authenticated and UserFollow.objects.filter(
+        follower=request.user,
+        following=author
+    ).exists()
+
+    post_objs = (
+        Post.objects
+        .filter(author=author, is_banned=False)
+        .select_related("author")
+        .prefetch_related("post_tags__tag")
+        .order_by("-created_at")
+    )
+
+    if request.user != author:
+        post_objs = post_objs.filter(is_private=False)
+
+    filter_type = request.GET.get("filter", "all")
+
+    if filter_type == "public":
+        post_objs = post_objs.filter(is_private=False)
+
+    elif filter_type == "popular":
+        post_objs = post_objs.order_by("-likes_count")
+
+    paginator = Paginator(post_objs, 10) 
+    page_number = request.GET.get("page", 1)
+    page_obj = paginator.get_page(page_number)
+
+    ctx = {
+        "title": f"{author.username} | Blogy",
+        "author": author,
+        "page_obj": page_obj,
+        "filter": filter_type,
+        "is_following": is_following,
+    }
+
+    return render(request, "accounts/author_profile.html", ctx)
+
+@login_required
+def toggle_follow(request, username):
+    
+    if request.method == 'POST':
+        author = get_object_or_404(
+            get_user_model(),
+            username=username,
+            is_active=True,
+            is_verified = True,
+            is_banned = False
+        )
+
+        userFollow_obj, created = UserFollow.objects.get_or_create(
+            follower= request.user,
+            following = author,
+        )
+        
+        if created:
+            request.user.followings_count += 1
+            author.followers_count += 1
+            messages.success(request, "Author Followed.")
+        else:
+            userFollow_obj.delete()
+            request.user.followings_count -= 1
+            author.followers_count -= 1
+            messages.success(request, "Author Unfollowed.")
+        
+        request.user.save()
+        author.save()
+            
+        invalid_redirect_urls = [
+            '/accounts/logout/',
+            '/accounts/register/',
+            '/accounts/login/'
+        ]
+        
+        if request.POST.get("next") and request.POST.get("next") not in invalid_redirect_urls:
+            return redirect(request.POST.get("next"))
+        else:
+            return redirect("acc_public_urls:author_profile", author.username)
+    else:
+        return redirect("acc_public_urls:author_profile", username)
+
+@login_required
+def followings(request):
+    userFollow_objs = UserFollow.objects.select_related("following").filter(
+        follower=request.user
+    ).order_by("-created_at")
+
+    paginator = Paginator(userFollow_objs, 10)
+    page_number = request.GET.get("page", 1)
+    page_obj = paginator.get_page(page_number)
+
+    ctx = {
+        "title": "Followings | Blogy",
+        "page_obj": page_obj
+    }
+    
+    return render(request, "accounts/followings.html", ctx)
+
+@login_required
+def followers(request):
+    userFollow_objs = UserFollow.objects.select_related("follower").filter(
+        following=request.user
+    ).order_by("-created_at")
+
+
+    paginator = Paginator(userFollow_objs, 10)
+    page_number = request.GET.get("page", 1)
+    page_obj = paginator.get_page(page_number)
+    
+    followers_ids = [obj.follower_id for obj in page_obj]
+    
+    following_ids = set(
+        UserFollow.objects.filter(
+            follower=request.user,
+            following_id__in = followers_ids
+        ).values_list("following_id", flat=True)
+    )
+    
+    ctx = {
+        "title": "Followers | Blogy",
+        "page_obj": page_obj,
+        "following_ids": following_ids,
+    }
+    
+    return render(request, "accounts/followers.html", ctx)

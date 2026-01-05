@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load readtime %}
+
+{% block head %}
+<!-- This heading is from post_detail.html  -->
+<style>
+    .article-content pre {
+    background-color: #0f172a; /* slate-900 */
+    color: #e5e7eb;           /* gray-200 */
+    padding: 1rem;
+    border-radius: 0.75rem;
+    overflow-x: auto;
+    font-size: 0.875rem;
+}
+
+.article-content code {
+    background-color: #f1f5f9;
+    color: #be185d;
+    padding: 0.15rem 0.35rem;
+    border-radius: 0.25rem;
+}
+
+.article-content pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="min-h-screen bg-gray-50 pt-16 pb-20 px-4">
+    <div class="max-w-4xl mx-auto">
+
+        <!-- POST CARD -->
+        <article class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+
+            <!-- THUMBNAIL -->
+            {% if post_obj.thumbnail %}
+            <div class="w-full aspect-video bg-gray-100">
+                <img src="{{ post_obj.thumbnail.url }}" alt="{{ post_obj.title }}" class="w-full h-full object-cover">
+            </div>
+            {% endif %}
+
+            <!-- CONTENT WRAPPER -->
+            <div class="p-8">
+
+                <!-- TITLE -->
+                <h1 class="text-3xl font-bold text-gray-900 leading-tight">
+                    {{ post_obj.title }}
+                </h1>
+                <hr class="mt-4">
+                <!-- META -->
+                <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500 mt-4">
+
+                    <!-- AUTHOR -->
+                    <div class="flex items-center justify-between gap-4">
+
+                        <!-- AUTHOR INFO -->
+                        <div class="flex items-center gap-3">
+
+                            <!-- Avatar -->
+                            <a href="{% url 'acc_public_urls:author_profile' post_obj.author.username %}">
+                                {% if post_obj.author.profile_image %}
+                                <img src="{{ post_obj.author.profile_image.url }}" alt="{{ post_obj.author.username }}"
+                                    class="h-10 w-10 rounded-full object-cover border">
+                                {% else %}
+                                <div class="h-10 w-10 rounded-full bg-gray-200
+                            flex items-center justify-center text-xs text-gray-500">
+                                    NA
+                                </div>
+                                {% endif %}
+                            </a>
+
+                            <!-- Username -->
+                            <a href="{% url 'acc_public_urls:author_profile' post_obj.author.username %}" class="font-medium text-gray-700 hover:underline">
+                                {{ post_obj.author.username }}
+                            </a>
+                        </div>
+
+                        <!-- FOLLOW / UNFOLLOW -->
+                        {% if not request.user.is_authenticated %}
+                        <a href="{% url 'accounts:login' %}?next={{request.path}}" class="px-4 py-1.5 rounded-full bg-indigo-500
+                               text-sm text-white hover:bg-indigo-600 transition cursor-pointer">
+                            Follow
+                        </a>
+                        {% elif request.user != post_obj.author %}
+                        <form method="post" action="{% url 'accounts:toggle_follow' post_obj.author.username %}">
+                            {% csrf_token %}
+                            
+                            <input type="hidden" name="next" value="{{request.path}}">
+
+                            {% if is_following %}
+                            <button type="submit" class="px-4 py-1.5 rounded-full border border-gray-300
+                               text-sm text-gray-700 hover:bg-gray-100 transition cursor-pointer">
+                                Following
+                            </button>
+                            {% else %}
+                            <button type="submit" class="px-4 py-1.5 rounded-full bg-indigo-500
+                               text-sm text-white hover:bg-indigo-600 transition cursor-pointer">
+                                Follow
+                            </button>
+                            {% endif %}
+                        </form>
+                        {% endif %}
+
+                    </div>
+
+                    <span>•</span>
+
+                    <!-- DATE -->
+                    <span>
+                        {{ post_obj.created_at|date:"M d, Y" }}
+                    </span>
+
+                    <span>•</span>
+
+                    <!-- READ TIME -->
+                    <span>
+                        {{ post_obj.read_time|readtime }}
+                    </span>
+                </div>
+
+                <!-- STATS -->
+                <div class="flex items-center gap-6 mt-6 text-sm text-gray-600">
+
+                    <!-- LIKE -->
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <button type="submit"
+                            class="flex items-center gap-1 hover:text-indigo-600 transition cursor-pointer">
+                            ❤️ <span>{{ post_obj.likes_count }}</span>
+                        </button>
+                    </form>
+
+                    <!-- COMMENTS -->
+                    <span>💬 {{ post_obj.comments_count }}</span>
+
+                </div>
+
+                <!-- TAGS -->
+                {% if post_obj.post_tags.all %}
+                <div class="flex flex-wrap gap-2 mt-6">
+                    {% for pt in post_obj.post_tags.all %}
+                    <span class="px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs">
+                        #{{ pt.tag.name }}
+                    </span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- TABLE OF CONTENT -->
+                {% if post_obj.table_of_content %}
+                <div class="mt-8 p-4 border rounded-xl bg-gray-50">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-2">
+                        Table of Contents
+                    </h3>
+                    <div class="prose prose-sm max-w-none">
+                        {{ post_obj.table_of_content|safe }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- POST CONTENT -->
+                <div class="prose max-w-none mt-10 article-content">
+                    {{ post_obj.content|safe }}
+                </div>
+
+            </div>
+        </article>
+
+        <!-- COMMENTS SECTION -->
+        <section class="mt-12">
+
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">
+                Comments ({{ post_obj.comments_count }})
+            </h2>
+
+            <!-- COMMENT FORM -->
+            {% if request.user.is_authenticated %}
+            <form method="post" action="" class="mb-8">
+                {% csrf_token %}
+                <textarea name="comment" rows="3" required placeholder="Write a comment..." class="w-full rounded-xl border border-gray-300 px-4 py-3
+                                 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+
+                <div class="flex justify-end mt-3">
+                    <button type="submit" class="px-6 py-2 rounded-full bg-indigo-500 text-white
+                                   hover:bg-indigo-600 transition">
+                        Comment
+                    </button>
+                </div>
+            </form>
+            {% else %}
+            <p class="text-sm text-gray-500 mb-8">
+                <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="text-indigo-500 underline">
+                    Login
+                </a>
+                to comment on this post.
+            </p>
+            {% endif %}
+
+            <!-- COMMENTS LIST -->
+            <div class="space-y-6">
+
+                {% for comment in post_obj.comments.all %}
+                <div class="border rounded-xl p-4">
+
+                    <div class="flex justify-between text-sm text-gray-500 mb-2">
+                        <span class="font-medium text-gray-700">
+                            {{ comment.user.username }}
+                        </span>
+                        <span>
+                            {{ comment.created_at|date:"M d, Y" }}
+                        </span>
+                    </div>
+
+                    <p class="text-gray-800 text-sm">
+                        {{ comment.content }}
+                    </p>
+
+                    <!-- REPLIES -->
+                    {% if comment.replies.all %}
+                    <div class="mt-4 pl-4 border-l space-y-3">
+                        {% for reply in comment.replies.all %}
+                        <div>
+                            <p class="text-xs text-gray-500">
+                                <b>{{ reply.user.username }}</b> • {{ reply.created_at|date:"M d, Y" }}
+                            </p>
+                            <p class="text-sm text-gray-700">
+                                {{ reply.content }}
+                            </p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                </div>
+                {% empty %}
+                <p class="text-sm text-gray-500">
+                    No comments yet.
+                </p>
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+    </div>
+</main>
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from post_detail.html  -->
+{% endblock %}

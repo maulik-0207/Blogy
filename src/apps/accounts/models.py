@@ -48,6 +48,7 @@ from django.db import models
 from django.utils.html import mark_safe
 from django.core.validators import EmailValidator, FileExtensionValidator
 # from django.core.exceptions import ValidationError
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from .helper_func import get_profile_image_path
 from .validators import username_validator, profile_image_validator
@@ -102,7 +103,7 @@ class User(AbstractUser):
         upload_to=get_profile_image_path,
         blank=True,
         null=True, 
-        validators=[profile_image_validator, FileExtensionValidator(['jpg', 'jpeg', 'png'])],
+        validators=[profile_image_validator, FileExtensionValidator(settings.PROFILE_IMAGE_ALLOWED_EXTENSIONS)],
         verbose_name="Profile Image"
     )
     

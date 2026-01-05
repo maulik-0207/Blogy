@@ -2,10 +2,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CreatePostForm, EditPostForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Post, Tag, PostTag
+from .models import Post
+from django.http import Http404
 from django.utils.text import slugify
 import random
-import copy
+from datetime import timedelta
+from django.utils.timezone import now
+import readtime
+from apps.accounts.models import UserFollow
 
 @login_required
 def create_post(request):
@@ -19,9 +23,8 @@ def create_post(request):
             post_obj = Post.objects.create(
                 title = data['title'],
                 author = request.user,
-                slug = slugify(data['title']) + "-" + "".join([random.choice("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") for _ in range(5)])
+                slug = slugify(data['title']) + "".join([random.choice("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") for _ in range(5)])
             )
-            post_obj.save()
             messages.success(request, "Post created successfully.")
             return redirect("posts:edit_post", uuid = post_obj.id)
     
@@ -37,8 +40,7 @@ def create_post(request):
 @login_required
 def edit_post(request, uuid):
     post_obj = get_object_or_404(Post.objects.filter(author = request.user), id = uuid, is_banned = False)
-    old_post_obj = copy.deepcopy(post_obj)
-    post_tags = [str(tag.tag.name) for tag in post_obj.post_tags.all()]
+    old_title = post_obj.title
     
     if request.method == 'POST':
         form = EditPostForm(data = request.POST, files=request.FILES, instance= post_obj)
@@ -46,29 +48,24 @@ def edit_post(request, uuid):
         if form.is_valid():
             data = form.cleaned_data
 
-            
-            if old_post_obj.title != data['title']:
-                post_obj.slug = slugify(data['title']) + "-" + "".join([random.choice("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") for _ in range(5)])
+            if old_title != data['title']:
+                post_obj.slug = slugify(data['title']) + "".join([random.choice("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") for _ in range(5)])
 
+            if data['content']:
+                result = readtime.of_html(data['content'])
+                post_obj.read_time = timedelta(seconds=result.seconds)
+            
+            post_obj.updated_at = now()
+            post_obj.content, post_obj.table_of_content = post_obj.generate_table_of_content_html()
             post_obj.save()
-            
-            tags_input = [tag.lower().strip() for tag in str(data['tags_input']).split(",")]
-            for tag in tags_input[:5]:
-                if not tag in post_tags and tag != "":
-                    tag_obj = Tag.objects.get_or_create(name = tag)[0]
-                    postTag_obj = PostTag.objects.create(post = post_obj, tag = tag_obj)
-            
-            for tag in post_tags:
-                if not tag in tags_input:
-                    postTag_obj = PostTag.objects.get(post = post_obj, tag__name = tag)
-                    postTag_obj.delete()
+            post_obj.set_tags(data['tags'])
             
             messages.success(request, "Post saved successfully.")
             return redirect("posts:edit_post", uuid = post_obj.id)
     
     else:
-        post_tags_str = ", ".join(post_tags)
-        form = EditPostForm(instance= post_obj, initial= {"tags_input" : post_tags_str})
+        post_tags_str = ", ".join([str(tag.tag.name) for tag in post_obj.post_tags.all()])
+        form = EditPostForm(instance= post_obj, initial= {"tags" : post_tags_str})
     
     ctx = {
         "title": f"Edit Post | {post_obj.title} | Blogy",
@@ -79,7 +76,7 @@ def edit_post(request, uuid):
 
 @login_required
 def delete_post(request, uuid):
-    post_obj = get_object_or_404(Post.objects.filter(author = request.user), id = uuid, is_banned = False)
+    post_obj = get_object_or_404(Post.objects.filter(author = request.user), id = uuid)
     
     if request.method == 'POST':
         post_obj.delete()
@@ -95,11 +92,29 @@ def delete_post(request, uuid):
 
 @login_required
 def my_posts(request):
-    post_objs = Post.objects.filter(author = request.user, is_banned = False)
-    
+    post_objs = Post.objects.filter(author = request.user).order_by("-created_at")
     
     ctx = {
-        "title": f"My Posts | Blogy",
+        "title": "My Posts | Blogy",
         "post_objs" : post_objs
     }
     return render(request, "posts/my_posts.html", context= ctx)
+
+def post_detail(request, slug):
+    post_obj = get_object_or_404(Post.objects.filter(is_banned = False), slug= slug)
+    
+    if post_obj.is_private and (not request.user.is_authenticated or post_obj.author != request.user):
+        raise Http404()
+    
+    is_following = request.user.is_authenticated and UserFollow.objects.filter(
+        follower=request.user,
+        following=post_obj.author
+    ).exists()
+    
+    ctx = {
+        "title" : f"{post_obj.title} | Blogy",
+        "post_obj": post_obj,
+        "is_following": is_following
+    }
+    
+    return render(request, "posts/post_detail.html", ctx)

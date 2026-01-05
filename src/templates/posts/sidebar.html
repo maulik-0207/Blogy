@@ -1,0 +1,18 @@
+<aside class="w-full md:w-64 bg-gray-50 border-b md:border-b-0 md:border-r p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-6">
+        Posts
+    </h2>
+
+    <nav class="space-y-1 text-sm">
+
+        <a href="{% url 'posts:create_post' %}"
+            class="block px-3 py-2 rounded-lg font-medium {% if request.path == '/posts/create/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+            Create New Post
+        </a>
+
+        <a href="{% url 'posts:my_posts' %}"
+            class="block px-3 py-2 rounded-lg {% if request.path == '/posts/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+            My Posts
+        </a>
+    </nav>
+</aside>

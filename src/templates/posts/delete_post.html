@@ -1,42 +1,114 @@
 {% extends 'base.html' %}
+{% load readtime %}
 
 {% block head %}
 <!-- This heading is from delete_post.html  -->
 {% endblock %}
 
 {% block content %}
-<main class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10">
-            <div class="card shadow-lg border-0">
-                <form method="post" class="card-body p-4">
-                    <h3 class="mb-4">Delete Post</h3>
-                    {% csrf_token %}
-                    <p><b>Slug: </b>{{post_obj.slug}}</p>
-                    <p><b>Title: </b>{{post_obj.title}}</p>
-                    <p><b>Read Time: </b>{{post_obj.read_time}}</p>
-                    <p><b>Likes: </b>{{post_obj.likes_count}}</p>
-                    <p><b>Comments: </b>{{post_obj.comments_count}}</p>
-                    <p><b>Visibility: </b>{% if post_obj.is_private %}Private{% else %}Public{% endif %}</p>
-                    <p class="text-danger"><b>This action Can't be un-done.</b></p>
+<main class="min-h-screen bg-gray-50 pt-16 pb-16 px-4">
+    <div class="w-full max-w-7xl mx-auto px-4">
 
-                    <!-- Action Buttons -->
-                    <div class="d-flex justify-content-end gap-2">
-                        <a 
-                        {% if request.GET.back %}
-                        href="{{request.GET.back}}"
-                        {% else %} 
-                        href="{% url 'posts:edit_post' post_obj.id %}" 
-                        {% endif %}
-                        class="btn btn-outline-primary">Go back</a>
-                        <button type="submit" class="btn btn-danger">Delete</button>
+        <div class="flex flex-col md:flex-row bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+
+            <!-- SIDEBAR -->
+            {% include 'posts/sidebar.html' %}
+
+            <!-- MAIN CONTENT -->
+            <section class="flex-1 p-8">
+
+                <!-- Header -->
+                <div class="mb-6">
+                    <h1 class="text-2xl font-semibold text-gray-900">
+                        Delete Post
+                    </h1>
+                    <p class="text-sm text-gray-500 mt-1">
+                        This action is permanent and cannot be undone.
+                    </p>
+                </div>
+
+                <!-- DANGER CARD -->
+                <div class="border border-red-200 bg-red-50 rounded-xl p-3 mb-8">
+                    <div class="flex items-start gap-3">
+                        <span class="text-red-600 text-xl font-bold">!</span>
+                        <p class="text-sm text-red-700">
+                            You are about to permanently delete this post.
+                            All related data (likes, comments, visibility) will be removed.
+                        </p>
                     </div>
+                </div>
+
+                <!-- POST DETAILS -->
+                <div class="bg-gray-50 border rounded-xl p-6 space-y-3 mb-8 text-sm">
+
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Slug</span>
+                        <span class="font-medium text-gray-900">{{ post_obj.slug }}</span>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Title</span>
+                        <span class="font-medium text-gray-900">
+                            {{ post_obj.title|default:"Untitled Post" }}
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Read Time</span>
+                        <span class="font-medium text-gray-900">
+                            {{ post_obj.read_time|readtime }}
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Likes</span>
+                        <span class="font-medium text-gray-900">
+                            {{ post_obj.likes_count }}
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Comments</span>
+                        <span class="font-medium text-gray-900">
+                            {{ post_obj.comments_count }}
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Visibility</span>
+                        <span class="font-medium text-gray-900">
+                            {% if post_obj.is_private %}Private{% else %}Public{% endif %}
+                        </span>
+                    </div>
+
+                </div>
+
+                <!-- FORM ACTIONS -->
+                <form method="post" class="flex items-center justify-end gap-4">
+                    {% csrf_token %}
+
+                    <a
+                        {% if request.GET.back %}
+                            href="{{ request.GET.back }}"
+                        {% else %}
+                            href="{% url 'posts:edit_post' post_obj.id %}"
+                        {% endif %}
+                        class="px-6 py-2 rounded-full border border-gray-300 text-gray-700
+                               hover:bg-gray-100 transition">
+                        Cancel
+                    </a>
+
+                    <button type="submit"
+                            class="px-6 py-2 rounded-full bg-red-600 text-white
+                                   hover:bg-red-700 transition cursor-pointer">
+                        Delete Post
+                    </button>
                 </form>
-            </div>
+
+            </section>
         </div>
     </div>
 </main>
-
 {% endblock %}
 
 {% block script %}

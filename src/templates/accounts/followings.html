@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<!-- This heading is from followings.html  -->
+{% endblock %}
+
+{% block content %}
+<main class="min-h-screen bg-gray-50 pt-16 pb-16 px-4">
+    <div class="w-full max-w-7xl mx-auto px-4">
+
+        <!-- Settings Layout -->
+        <div class="flex flex-col md:flex-row bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+
+            <!-- SIDEBAR -->
+            {% include 'accounts/sidebar.html' %}
+
+            <!-- MAIN CONTENT -->
+            <section class="flex-1 p-8">
+
+                <!-- Header -->
+                <div class="mb-8">
+                    <h1 class="text-2xl font-semibold text-gray-900">
+                        Following
+                    </h1>
+                    <p class="text-sm text-gray-500 mt-1">
+                        Authors you are currently following.
+                    </p>
+                </div>
+
+                <!-- FOLLOWINGS LIST -->
+                <div class="space-y-4">
+
+                    {% for follow in page_obj %}
+                    {% with author=follow.following %}
+                    <div
+                        class="flex items-center justify-between border border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition">
+
+                        <!-- Author Info -->
+                        <div class="flex items-center gap-4">
+                            <!-- Avatar -->
+                            <div class="h-12 w-12 rounded-full overflow-hidden bg-gray-200 shrink-0">
+                                {% if author.profile_image %}
+                                <img src="{{ author.profile_image.url }}" class="h-full w-full object-cover">
+                                {% else %}
+                                <div class="h-full w-full flex items-center justify-center
+                                                    text-sm font-semibold text-gray-500">
+                                    NA
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Username -->
+                            <div>
+                                <a href="{% url 'acc_public_urls:author_profile' author.username %}"
+                                    class="text-sm font-semibold text-gray-900 hover:underline">
+                                    {{ author.username }}
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Unfollow Button -->
+                        <form method="post" action="{% url 'accounts:toggle_follow' author.username %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="next"
+                                value="{{ request.path }}{% if request.GET.page %}?page={{request.GET.page}}{% endif %}">
+                            <button type="submit" class="px-4 py-1.5 rounded-full text-sm font-medium
+                                               border border-red-300 text-red-600
+                                               hover:bg-red-50 transition cursor-pointer">
+                                Unfollow
+                            </button>
+                        </form>
+
+                    </div>
+                    {% endwith %}
+                    {% empty %}
+                    <div class="text-center text-sm text-gray-500 py-12">
+                        You are not following anyone yet.
+                    </div>
+                    {% endfor %}
+
+                </div>
+
+                <!-- PAGINATION -->
+                {% if page_obj.has_other_pages %}
+                <div class="flex justify-center mt-10">
+                    <nav class="flex items-center gap-2 text-sm">
+
+                        {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}"
+                            class="px-3 py-1 rounded border hover:bg-gray-100">
+                            Prev
+                        </a>
+                        {% endif %}
+
+                        <span class="px-3 py-1 text-gray-500">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                        </span>
+
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}"
+                            class="px-3 py-1 rounded border hover:bg-gray-100">
+                            Next
+                        </a>
+                        {% endif %}
+
+                    </nav>
+                </div>
+                {% endif %}
+
+            </section>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from followings.html  -->
+{% endblock %}

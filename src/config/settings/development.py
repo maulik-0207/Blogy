@@ -5,18 +5,18 @@ DEBUG = True
 INSTALLED_APPS += [
     'debug_toolbar',
     "tailwind",
-    "apps.theme"
+    "apps.theme",
+    "django_browser_reload"
 ]
 
 MIDDLEWARE += [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
 
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
-
-TAILWIND_APP_NAME = "apps.theme"
 
 AUTH_PASSWORD_VALIDATORS = []
 
@@ -28,3 +28,6 @@ POST_THUMBNAIL_ALLOWED_EXTENSIONS = ['jpg','png','jpeg']
 
 POST_IMAGE_MAX_SIZE = 2000000 # bytes - approx 2 mb
 POST_IMAGE_ALLOWED_EXTENSIONS = ['jpg','png','jpeg']
+
+TAILWIND_APP_NAME = "apps.theme"
+NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
