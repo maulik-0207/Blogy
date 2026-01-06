@@ -6,26 +6,28 @@
 <!-- This heading is from post_detail.html  -->
 <style>
     .article-content pre {
-    background-color: #0f172a; /* slate-900 */
-    color: #e5e7eb;           /* gray-200 */
-    padding: 1rem;
-    border-radius: 0.75rem;
-    overflow-x: auto;
-    font-size: 0.875rem;
-}
+        background-color: #0f172a;
+        /* slate-900 */
+        color: #e5e7eb;
+        /* gray-200 */
+        padding: 1rem;
+        border-radius: 0.75rem;
+        overflow-x: auto;
+        font-size: 0.875rem;
+    }
 
-.article-content code {
-    background-color: #f1f5f9;
-    color: #be185d;
-    padding: 0.15rem 0.35rem;
-    border-radius: 0.25rem;
-}
+    .article-content code {
+        background-color: #f1f5f9;
+        color: #be185d;
+        padding: 0.15rem 0.35rem;
+        border-radius: 0.25rem;
+    }
 
-.article-content pre code {
-    background: none;
-    padding: 0;
-    color: inherit;
-}
+    .article-content pre code {
+        background: none;
+        padding: 0;
+        color: inherit;
+    }
 </style>
 {% endblock %}
 
@@ -74,7 +76,8 @@
                             </a>
 
                             <!-- Username -->
-                            <a href="{% url 'acc_public_urls:author_profile' post_obj.author.username %}" class="font-medium text-gray-700 hover:underline">
+                            <a href="{% url 'acc_public_urls:author_profile' post_obj.author.username %}"
+                                class="font-medium text-gray-700 hover:underline">
                                 {{ post_obj.author.username }}
                             </a>
                         </div>
@@ -88,7 +91,7 @@
                         {% elif request.user != post_obj.author %}
                         <form method="post" action="{% url 'accounts:toggle_follow' post_obj.author.username %}">
                             {% csrf_token %}
-                            
+
                             <input type="hidden" name="next" value="{{request.path}}">
 
                             {% if is_following %}
@@ -123,19 +126,36 @@
                 </div>
 
                 <!-- STATS -->
-                <div class="flex items-center gap-6 mt-6 text-sm text-gray-600">
+                <div class="flex items-center gap-6 mt-6 text-sm">
 
                     <!-- LIKE -->
-                    <form method="post" action="">
+                    <form method="post" action="{% url 'posts:toggle_like' post_obj.slug %}">
                         {% csrf_token %}
-                        <button type="submit"
-                            class="flex items-center gap-1 hover:text-indigo-600 transition cursor-pointer">
-                            ❤️ <span>{{ post_obj.likes_count }}</span>
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+                        <button type="submit" class="flex items-center gap-1 transition cursor-pointer
+                            {% if is_liked %}
+                                text-red-600 hover:text-red-700
+                            {% else %}
+                                text-gray-600 hover:text-indigo-600
+                            {% endif %}">
+
+                            {% if is_liked %}
+                            ❤️
+                            {% else %}
+                            🤍
+                            {% endif %}
+
+                            <span class="font-medium">
+                                {{ post_obj.likes_count }}
+                            </span>
                         </button>
                     </form>
 
                     <!-- COMMENTS -->
-                    <span>💬 {{ post_obj.comments_count }}</span>
+                    <span class="text-gray-600 flex items-center gap-1">
+                        💬 {{ post_obj.comments_count }}
+                    </span>
 
                 </div>
 

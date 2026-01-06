@@ -2,13 +2,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CreatePostForm, EditPostForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Post
+from .models import Post, PostLike
 from django.http import Http404
 from django.utils.text import slugify
 import random
 from datetime import timedelta
 from django.utils.timezone import now
 import readtime
+from django.core.paginator import Paginator
 from apps.accounts.models import UserFollow
 
 @login_required
@@ -94,9 +95,13 @@ def delete_post(request, uuid):
 def my_posts(request):
     post_objs = Post.objects.filter(author = request.user).order_by("-created_at")
     
+    paginator = Paginator(post_objs, 10)
+    page_number = request.GET.get("page", 1)
+    page_obj = paginator.get_page(page_number)
+    
     ctx = {
         "title": "My Posts | Blogy",
-        "post_objs" : post_objs
+        "post_objs" : page_obj
     }
     return render(request, "posts/my_posts.html", context= ctx)
 
@@ -111,10 +116,49 @@ def post_detail(request, slug):
         following=post_obj.author
     ).exists()
     
+    is_liked = request.user.is_authenticated and PostLike.objects.filter(
+        post = post_obj,
+        user = request.user
+    ).exists()
+    
     ctx = {
         "title" : f"{post_obj.title} | Blogy",
         "post_obj": post_obj,
-        "is_following": is_following
+        "is_following": is_following,
+        "is_liked": is_liked
     }
     
     return render(request, "posts/post_detail.html", ctx)
+
+@login_required
+def toggle_like(request, slug):
+    if request.method == 'POST':
+        post_obj = get_object_or_404(Post.objects.filter(is_banned = False, is_private = False), slug= slug)
+        
+        postLike_obj, created = PostLike.objects.get_or_create(
+            user= request.user,
+            post= post_obj,
+        )
+        
+        if created:
+            post_obj.likes_count += 1
+            messages.success(request, "Post Liked.")
+        else:
+            postLike_obj.delete()
+            post_obj.likes_count -= 1
+            messages.success(request, "Post Unliked.")
+        post_obj.save()
+        
+        invalid_redirect_urls = [
+            '/accounts/logout/',
+            '/accounts/register/',
+            '/accounts/login/'
+        ]
+        
+        if request.POST.get("next") and request.POST.get("next") not in invalid_redirect_urls:
+            return redirect(request.POST.get("next"))
+        else:
+            return redirect("posts:post_detail", slug)
+    else:
+        return redirect("posts:post_detail", slug)
+        

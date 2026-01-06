@@ -67,9 +67,11 @@
                         <!-- ACTIONS -->
                         <div class="flex items-center gap-4 text-sm whitespace-nowrap">
                             {% if not post_obj.is_banned %}
-                            <a href="{% url 'posts:edit_post' post_obj.id %}" class="text-gray-600 hover:text-gray-900">Edit</a>
+                            <a href="{% url 'posts:edit_post' post_obj.id %}"
+                                class="text-gray-600 hover:text-gray-900">Edit</a>
                             {% endif %}
-                            <a href="{% url 'posts:delete_post' post_obj.id %}?back={{request.path}}" class="text-red-500 hover:text-red-600">Delete</a>
+                            <a href="{% url 'posts:delete_post' post_obj.id %}?back={{request.path}}"
+                                class="text-red-500 hover:text-red-600">Delete</a>
                         </div>
                     </div>
                     {% endfor %}
@@ -87,6 +89,33 @@
                     </a>
                 </div>
 
+                {% endif %}
+
+                <!-- PAGINATION -->
+                {% if post_objs.has_other_pages %}
+                <div class="flex justify-center mt-10">
+                    <nav class="flex items-center gap-2 text-sm">
+
+                        {% if post_objs.has_previous %}
+                        <a href="?page={{ post_objs.previous_page_number }}"
+                            class="px-3 py-1 rounded border hover:bg-gray-100">
+                            Prev
+                        </a>
+                        {% endif %}
+
+                        <span class="px-3 py-1 text-gray-500">
+                            Page {{ post_objs.number }} of {{ post_objs.paginator.num_pages }}
+                        </span>
+
+                        {% if post_objs.has_next %}
+                        <a href="?page={{ post_objs.next_page_number }}"
+                            class="px-3 py-1 rounded border hover:bg-gray-100">
+                            Next
+                        </a>
+                        {% endif %}
+
+                    </nav>
+                </div>
                 {% endif %}
 
             </section>
