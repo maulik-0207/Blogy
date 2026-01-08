@@ -1,0 +1,105 @@
+<div class="border rounded-xl p-4 bg-white">
+
+    <!-- HEADER -->
+    <div class="flex justify-between items-start">
+        <div class="text-sm">
+            <span class="font-semibold text-gray-800">
+                <a target="_blank" href="{% url 'acc_public_urls:author_profile' comment.user.username %}">
+                    {{ comment.user.username }}</a>
+            </span>
+            <span class="text-gray-500 text-xs ml-2">
+                {{ comment.created_at|date:"M d, Y" }}
+            </span>
+        </div>
+
+        {% if request.user.is_authenticated and comment.user == request.user %}
+        <!-- DELETE -->
+        <form method="post" action="{% url 'comments:delete_comment' comment.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{request.get_full_path}}">
+            <button type="submit" class="text-xs text-red-500 hover:underline cursor-pointer">
+                Delete
+            </button>
+        </form>
+        {% endif %}
+    </div>
+
+    <!-- CONTENT -->
+    <p class="text-sm text-gray-800 whitespace-pre-line wrap-break-word">
+        {{ comment.content }}
+    </p>
+
+    <!-- ACTIONS -->
+    <div class="flex items-center gap-6 mt-3 text-xs text-gray-500">
+
+        <!-- LIKE -->
+        <form method="post" action="{% url 'comments:toggle_like' comment.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{request.get_full_path}}">
+            <button type="submit" class="flex items-center gap-1 hover:text-indigo-600 transition cursor-pointer">
+                {% if comment.id in liked_comment_ids %}
+                ❤️
+                {% else %}
+                🤍
+                {% endif %}
+                <span>{{ comment.likes }}</span>
+            </button>
+        </form>
+        <!-- REPLY -->
+         {% if max_reply_lvl > reply_lvl %}
+        <button type="button" onclick="toggleReplyForm('{{ comment.id }}')"
+            class="text-xs text-gray-500 hover:text-indigo-600 transition cursor-pointer">
+            Reply
+        </button>
+        {% endif %}
+
+    </div>
+    {% if max_reply_lvl > reply_lvl %}
+    <div id="reply-form-{{ comment.id }}" class="hidden mt-4">
+
+        {% if request.user.is_authenticated %}
+        <form method="post" action="{% url 'comments:create_comment' post_obj.slug %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{request.get_full_path}}">
+            <input type="hidden" name="parent" value="{{ comment.id }}">
+
+            <textarea name="content" rows="2" required placeholder="Write a reply..." class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
+                         focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+
+            <div class="flex justify-end mt-2 gap-2">
+                <button type="button" onclick="toggleReplyForm('{{ comment.id }}')"
+                    class="text-xs text-gray-500 hover:underline cursor-pointer">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-1.5 rounded-full bg-indigo-500 text-white
+                           text-xs hover:bg-indigo-600 transition cursor-pointer">
+                    Reply
+                </button>
+            </div>
+        </form>
+        {% else %}
+        <p class="text-xs text-gray-500">
+            <a href="{% url 'accounts:login' %}?next={{ request.get_full_path }}" class="text-indigo-600 underline">
+                Login
+            </a> to reply.
+        </p>
+        {% endif %}
+    </div>
+    {% endif %}
+    <!-- REPLIES -->
+    {% if comment.replies.exists and max_reply_lvl > reply_lvl %}
+    <div class="mt-4 pl-4 space-y-3">
+        {% for reply in comment.replies.all|slice:":{{slice_lvl}}" %}
+        {% include "comments/comment_item.html" with comment=reply reply_lvl=reply_lvl|add:1 max_reply_lvl=max_reply_lvl slice_lvl=slice_lvl %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+    function toggleReplyForm(commentId) {
+        const el = document.getElementById(`reply-form-${commentId}`);
+        el.classList.toggle("hidden");
+    }
+</script>

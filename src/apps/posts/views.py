@@ -11,6 +11,7 @@ from django.utils.timezone import now
 import readtime
 from django.core.paginator import Paginator
 from apps.accounts.models import UserFollow
+from apps.comments.models import Comment, CommentLike
 
 @login_required
 def create_post(request):
@@ -121,11 +122,37 @@ def post_detail(request, slug):
         user = request.user
     ).exists()
     
+    comments = Comment.objects.filter(
+        post = post_obj,
+        parent__isnull = True
+    )
+    
+    if request.user.is_authenticated:
+        user_comments = Comment.objects.filter(
+            post = post_obj,
+            user = request.user,
+            parent__isnull = True
+        )[:5]
+        comments = comments.exclude(user = request.user)[:5]
+        liked_comment_ids = set(
+            CommentLike.objects.filter(
+                user=request.user,
+                comment__post_id = post_obj.id 
+            ).values_list("comment_id", flat=True)
+        )
+    else:
+        user_comments = Comment.objects.none()
+        liked_comment_ids = set()
+        comments = comments[:5]
+    
     ctx = {
         "title" : f"{post_obj.title} | Blogy",
         "post_obj": post_obj,
         "is_following": is_following,
-        "is_liked": is_liked
+        "is_liked": is_liked,
+        "user_comments": user_comments,
+        "comments": comments,
+        "liked_comment_ids": liked_comment_ids
     }
     
     return render(request, "posts/post_detail.html", ctx)

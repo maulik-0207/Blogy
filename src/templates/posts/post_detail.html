@@ -193,75 +193,72 @@
         <!-- COMMENTS SECTION -->
         <section class="mt-12">
 
+            <!-- HEADER -->
             <h2 class="text-xl font-semibold text-gray-900 mb-6">
                 Comments ({{ post_obj.comments_count }})
             </h2>
 
             <!-- COMMENT FORM -->
             {% if request.user.is_authenticated %}
-            <form method="post" action="" class="mb-8">
+            <form method="post" action="{% url 'comments:create_comment' post_obj.slug %}" class="mb-10">
                 {% csrf_token %}
-                <textarea name="comment" rows="3" required placeholder="Write a comment..." class="w-full rounded-xl border border-gray-300 px-4 py-3
-                                 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                
+                <input type="hidden" name="next" value="{{request.get_full_path}}">
+
+                <textarea name="content" rows="3" required placeholder="Write a comment..." class="w-full rounded-xl border border-gray-300 px-4 py-3
+                         focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="2000"></textarea>
 
                 <div class="flex justify-end mt-3">
                     <button type="submit" class="px-6 py-2 rounded-full bg-indigo-500 text-white
-                                   hover:bg-indigo-600 transition">
+                           hover:bg-indigo-600 transition cursor-pointer">
                         Comment
                     </button>
                 </div>
             </form>
             {% else %}
-            <p class="text-sm text-gray-500 mb-8">
-                <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="text-indigo-500 underline">
+            <p class="text-sm text-gray-500 mb-10">
+                <a href="{% url 'accounts:login' %}?next={{ request.get_full_path }}" class="text-indigo-600 underline">
                     Login
-                </a>
-                to comment on this post.
+                </a> to comment on this post.
             </p>
             {% endif %}
 
-            <!-- COMMENTS LIST -->
-            <div class="space-y-6">
+            <!-- ================= USER COMMENTS ================= -->
+            {% if user_comments %}
+            <div class="mb-10">
+                <h3 class="text-sm font-semibold text-gray-700 mb-4">
+                    Your comments
+                </h3>
 
-                {% for comment in post_obj.comments.all %}
-                <div class="border rounded-xl p-4">
-
-                    <div class="flex justify-between text-sm text-gray-500 mb-2">
-                        <span class="font-medium text-gray-700">
-                            {{ comment.user.username }}
-                        </span>
-                        <span>
-                            {{ comment.created_at|date:"M d, Y" }}
-                        </span>
-                    </div>
-
-                    <p class="text-gray-800 text-sm">
-                        {{ comment.content }}
-                    </p>
-
-                    <!-- REPLIES -->
-                    {% if comment.replies.all %}
-                    <div class="mt-4 pl-4 border-l space-y-3">
-                        {% for reply in comment.replies.all %}
-                        <div>
-                            <p class="text-xs text-gray-500">
-                                <b>{{ reply.user.username }}</b> • {{ reply.created_at|date:"M d, Y" }}
-                            </p>
-                            <p class="text-sm text-gray-700">
-                                {{ reply.content }}
-                            </p>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-
+                <div class="space-y-5">
+                    {% for comment in user_comments %}
+                    {% include "comments/comment_item.html" with comment=comment reply_lvl=0 max_reply_lvl=2 slice_lvl=1 %}
+                        {% if forloop.last %}
+                            <a href="{% url 'comments:my_comments' post_obj.slug %}" class="text-indigo-600 underline text-sm">More Comments..</a>
+                        {% endif %}
+                    {% endfor %}
                 </div>
-                {% empty %}
-                <p class="text-sm text-gray-500">
-                    No comments yet.
-                </p>
-                {% endfor %}
+            </div>
+            {% endif %}
 
+            <!-- ================= OTHER COMMENTS ================= -->
+            <div>
+                <h3 class="text-sm font-semibold text-gray-700 mb-4">
+                    All comments
+                </h3>
+
+                <div class="space-y-5">
+                    {% for comment in comments %}
+                    {% include "comments/comment_item.html" with comment=comment reply_lvl=0 max_reply_lvl=2 slice_lvl=1 %}
+                        {% if forloop.last %}
+                            <a href="{% url 'comments:all_comments' post_obj.slug %}" class="text-indigo-600 underline text-sm">More Comments..</a>
+                        {% endif %}
+                    {% empty %}
+                    <p class="text-sm text-gray-500">
+                        No comments yet.
+                    </p>
+                    {% endfor %}
+                </div>
             </div>
 
         </section>

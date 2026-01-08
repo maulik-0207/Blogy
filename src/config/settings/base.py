@@ -356,3 +356,6 @@ JAZZMIN_UI_TWEAKS = {
     },
     "actions_sticky_top": True
 }
+
+# to run django-jazzmin's related_modal_active = True
+X_FRAME_OPTIONS = 'SAMEORIGIN'

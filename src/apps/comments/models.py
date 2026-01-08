@@ -47,7 +47,7 @@ from uuid import uuid4
 from django.db import models
 from django.contrib.auth import get_user_model
 from apps.posts.models import Post
-from django.core.exceptions import ValidationError
+# from django.core.exceptions import ValidationError
 # Create your models here.
 
 
@@ -152,10 +152,15 @@ class CommentLike(models.Model):
     )
     
     def __str__(self) -> str:
-        return f"{self.user.username} liked comment:{self.comment[:20]}"
+        return f"{self.user.username} liked comment:{self.comment.content[:20]}"
 
     class Meta:
         verbose_name = "Comment Like"
         verbose_name_plural = "Comment Likes"
         ordering = ["-created_at",]
-        unique_together = ('comment', 'user')
+        constraints =[
+            models.UniqueConstraint(
+                fields= ['comment', 'user'],
+                name= 'unique_comment_like'
+            )
+        ]

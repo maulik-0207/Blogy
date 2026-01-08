@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<!-- This heading is from all_comments.html  -->
+{% endblock %}
+
+{% block content %}
+<main class="min-h-screen bg-gray-50 pt-16 pb-20 px-4">
+    <div class="max-w-4xl mx-auto">
+        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 mb-10">
+    
+            <div class="flex gap-4">
+    
+                <!-- THUMBNAIL -->
+                <a href="{% url 'posts:post_detail' post_obj.slug %}" class="shrink-0">
+                    {% if post_obj.thumbnail %}
+                    <img src="{{ post_obj.thumbnail.url }}" alt="{{ post_obj.title }}"
+                        class="w-28 h-20 rounded-lg object-cover">
+                    {% else %}
+                    <div class="w-28 h-20 rounded-lg bg-gray-200 flex items-center justify-center text-gray-500 text-xs">
+                        No Image
+                    </div>
+                    {% endif %}
+                </a>
+    
+                <!-- POST INFO -->
+                <div class="flex-1">
+    
+                    <!-- TITLE -->
+                    <h1 class="text-lg font-semibold text-gray-900 leading-tight">
+                        <a href="{% url 'posts:post_detail' post_obj.slug %}" class="hover:underline">
+                            {{ post_obj.title }}
+                        </a>
+                    </h1>
+    
+                    <!-- META -->
+                    <div class="text-xs text-gray-500 mt-1">
+                        By
+                        <a href="{% url 'acc_public_urls:author_profile' post_obj.author.username %}"
+                            class="hover:underline text-gray-700">
+                            {{ post_obj.author.username }}
+                        </a>
+                        • {{ post_obj.created_at|date:"M d, Y" }}
+                    </div>
+    
+                    <!-- TAGS -->
+                    {% if post_obj.tags.all %}
+                    <div class="flex flex-wrap gap-2 mt-3">
+                        {% for tag in post_obj.tags.all %}
+                        <a href=""
+                            class="text-xs px-2 py-1 bg-indigo-50 text-indigo-600 rounded-full hover:bg-indigo-100">
+                            #{{ tag.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+    
+                    <!-- STATS -->
+                    <div class="flex items-center gap-5 text-sm text-gray-600 mt-4">
+    
+                        <!-- LIKES -->
+                        <div class="flex items-center gap-1">
+                            ❤️
+                            <span>{{ post_obj.likes_count }}</span>
+                        </div>
+    
+                        <!-- COMMENTS -->
+                        <div class="flex items-center gap-1">
+                            💬
+                            <span>{{ post_obj.comments_count }}</span>
+                        </div>
+    
+                    </div>
+    
+                </div>
+            </div>
+    
+        </section>
+
+        <!-- COMMENTS SECTION -->
+        <section class="mt-12">
+
+            <!-- HEADER -->
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">
+                All Comments ({{ post_obj.comments_count }})
+            </h2>
+
+            <!-- COMMENT FORM -->
+            {% if request.user.is_authenticated %}
+            <form method="post" action="{% url 'comments:create_comment' post_obj.slug %}" class="mb-10">
+                {% csrf_token %}
+
+                <input type="hidden" name="next" value="{{request.get_full_path}}">
+
+                <textarea name="content" rows="3" required placeholder="Write a comment..." class="w-full rounded-xl border border-gray-300 px-4 py-3
+                         focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="2000"></textarea>
+
+                <div class="flex justify-end mt-3">
+                    <button type="submit" class="px-6 py-2 rounded-full bg-indigo-500 text-white
+                           hover:bg-indigo-600 transition cursor-pointer">
+                        Comment
+                    </button>
+                </div>
+            </form>
+            {% else %}
+            <p class="text-sm text-gray-500 mb-10">
+                <a href="{% url 'accounts:login' %}?next={{ request.get_full_path }}" class="text-indigo-600 underline">
+                    Login
+                </a> to comment on this post.
+            </p>
+            {% endif %}
+
+            <!-- ================= ALL COMMENTS ================= -->
+            {% if all_comments %}
+            <div class="mb-10">
+                <h3 class="text-sm font-semibold text-gray-700 mb-4">
+                    All comments
+                </h3>
+
+                <div class="space-y-5">
+                    {% for comment in all_comments %}
+                    {% include "comments/comment_item.html" with comment=comment reply_lvl=0 max_reply_lvl=8 slice_lvl=50 %}
+                    {% empty %}
+                    <p class="text-sm text-gray-500">
+                        No comments yet.
+                    </p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            <!-- PAGINATION -->
+            {% if all_comments.has_other_pages %}
+            <div class="flex justify-center mt-10">
+                <nav class="flex items-center gap-2 text-sm">
+
+                    {% if all_comments.has_previous %}
+                    <a href="?page={{ all_comments.previous_page_number }}"
+                        class="px-3 py-1 rounded border hover:bg-gray-100">
+                        Prev
+                    </a>
+                    {% endif %}
+
+                    <span class="px-3 py-1 text-gray-500">
+                        Page {{ all_comments.number }} of {{ all_comments.paginator.num_pages }}
+                    </span>
+
+                    {% if all_comments.has_next %}
+                    <a href="?page={{ all_comments.next_page_number }}"
+                        class="px-3 py-1 rounded border hover:bg-gray-100">
+                        Next
+                    </a>
+                    {% endif %}
+
+                </nav>
+            </div>
+            {% endif %}
+        </section>
+
+    </div>
+</main>
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from all_comments.html  -->
+{% endblock %}

@@ -42,6 +42,10 @@ class ExampleModelForm(forms.ModelForm):
         pass
 """
 from django import forms
-from .models import *  
+from .models import Comment  
 # Create your forms here.
 
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['user', 'post', 'content', 'parent']
