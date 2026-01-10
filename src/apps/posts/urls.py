@@ -10,4 +10,5 @@ urlpatterns = [
     path('edit/<uuid:uuid>/', views.edit_post, name='edit_post'),
     path('delete/<uuid:uuid>/', views.delete_post, name='delete_post'),
     path('toggle-like/<slug:slug>/', views.toggle_like, name='toggle_like'),
+    path("upload-image/<slug:slug>/", views.upload_image, name="upload_image"),
 ]

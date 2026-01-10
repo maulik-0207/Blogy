@@ -47,7 +47,9 @@ from uuid import uuid4
 from django.db import models
 from django.utils.html import mark_safe
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
+from apps.comments.models import Comment
+from django.urls import reverse_lazy
+from apps.posts.models import Post
 # Create your models here.
 
 
@@ -109,17 +111,104 @@ class Notification(models.Model):
     @property
     def icon_preview(self):
         if self.icon:
-            return mark_safe(f'<img src="/media/{self.icon}" width="150" />')
+            return mark_safe(f'<img src="{self.icon}" width="150" />')
         else:
             return mark_safe("<p>No Icon.</p>")
     
     def __str__(self) -> str:
-        return f"{self.author.username} -> {self.title}"
-    
-    def __str__(self) -> str:
-        return f"{self.user.username} | {self.title}"
+        return f"{self.user.username} -> {self.title}"
     
     class Meta:
         verbose_name = "Notification"
         verbose_name_plural = "Notifications"
         ordering = ["-created_at",]
+
+
+class NotificationService:
+
+    @staticmethod
+    def create_comment_notification(user, comment_obj: Comment, post_obj: Post):
+        link = reverse_lazy(
+            "comments:all_comments",
+            kwargs={"slug": post_obj.slug}
+        )
+
+        # Reply to a comment
+        if comment_obj.parent:
+            parent_user = comment_obj.parent.user
+
+            if parent_user != user:
+                Notification.objects.create(
+                    user=parent_user,
+                    title=f"{user.username} replied to your comment",
+                    link=link
+                )
+
+        # New comment on post
+        else:
+            if post_obj.author != user:
+                Notification.objects.create(
+                    user=post_obj.author,
+                    title=f"{user.username} commented on your post",
+                    link=link
+                )
+
+    @staticmethod
+    def create_post_like_notification(user, post_obj: Post):
+        if post_obj.author == user:
+            return  # no self-like notification
+
+        Notification.objects.create(
+            user=post_obj.author,
+            title=f"{user.username} liked your post",
+            link=reverse_lazy(
+                "posts:post_detail",
+                kwargs={"slug": post_obj.slug}
+            )
+        )
+
+    @staticmethod
+    def create_comment_like_notification(user, comment_obj: Comment):
+        if comment_obj.user == user:
+            return  # no self-like notification
+
+        Notification.objects.create(
+            user=comment_obj.user,
+            title=f"{user.username} liked your comment",
+            link=reverse_lazy(
+                "comments:all_comments",
+                kwargs={"slug": comment_obj.post.slug}
+            )
+        )
+
+    @staticmethod
+    def create_follow_notification(follower, following):
+        if follower == following:
+            return
+
+        Notification.objects.create(
+            user=following,
+            title=f"{follower.username} started following you",
+            link=reverse_lazy(
+                "acc_public_urls:author_profile",
+                kwargs={"username": follower.username}
+            )
+        )
+
+    @staticmethod
+    def create_follow_back_notification(follower, following):
+        """
+        follower = the user who followed back
+        following = the original follower
+        """
+        if follower == following:
+            return
+
+        Notification.objects.create(
+            user=following,
+            title=f"{follower.username} followed you back",
+            link=reverse_lazy(
+                "acc_public_urls:author_profile",
+                kwargs={"username": follower.username}
+            )
+        )

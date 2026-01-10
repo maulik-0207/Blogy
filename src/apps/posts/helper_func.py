@@ -21,3 +21,9 @@ def get_post_image_path(instance, filename):
     today = date.today()
 
     return os.path.join('posts', 'images', str(today.year), str(today.month), new_filename)
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        return x_forwarded_for.split(",")[0]
+    return request.META.get("REMOTE_ADDR")

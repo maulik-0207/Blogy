@@ -1,17 +1,22 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import CreatePostForm, EditPostForm
+from .forms import CreatePostForm, EditPostForm, PostImageForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Post, PostLike
+from .models import Post, PostLike, PostImage, PostView
 from django.http import Http404
 from django.utils.text import slugify
 import random
+from django.http import JsonResponse
 from datetime import timedelta
 from django.utils.timezone import now
 import readtime
 from django.core.paginator import Paginator
+from django.views.decorators.csrf import csrf_exempt
 from apps.accounts.models import UserFollow
 from apps.comments.models import Comment, CommentLike
+from .helper_func import get_client_ip
+from apps.notifications.models import NotificationService
+
 
 @login_required
 def create_post(request):
@@ -56,6 +61,7 @@ def edit_post(request, uuid):
             if data['content']:
                 result = readtime.of_html(data['content'])
                 post_obj.read_time = timedelta(seconds=result.seconds)
+                post_obj.remove_unused_post_images()
             
             post_obj.updated_at = now()
             post_obj.content, post_obj.table_of_content = post_obj.generate_table_of_content_html()
@@ -111,6 +117,27 @@ def post_detail(request, slug):
     
     if post_obj.is_private and (not request.user.is_authenticated or post_obj.author != request.user):
         raise Http404()
+    
+    ip_address = get_client_ip(request)
+    user_agent = request.META.get("HTTP_USER_AGENT", "")[:500]
+
+    if request.user.is_authenticated:
+        PostView.objects.get_or_create(
+            post=post_obj,
+            user=request.user,
+            defaults={
+                "ip_address": ip_address,
+                "user_agent": user_agent,
+            }
+        )
+    else:
+        PostView.objects.get_or_create(
+            post=post_obj,
+            ip_address=ip_address,
+            defaults={
+                "user_agent": user_agent,
+            }
+        )
     
     is_following = request.user.is_authenticated and UserFollow.objects.filter(
         follower=request.user,
@@ -170,6 +197,10 @@ def toggle_like(request, slug):
         if created:
             post_obj.likes_count += 1
             messages.success(request, "Post Liked.")
+            NotificationService.create_post_like_notification(
+                user=request.user,
+                post_obj=post_obj
+            )
         else:
             postLike_obj.delete()
             post_obj.likes_count -= 1
@@ -188,4 +219,23 @@ def toggle_like(request, slug):
             return redirect("posts:post_detail", slug)
     else:
         return redirect("posts:post_detail", slug)
+
+@csrf_exempt
+@login_required
+def upload_image(request, slug):
+    if request.method == "POST":
+        post_obj = get_object_or_404(Post.objects.filter(is_banned = False, is_private = False, author= request.user), slug= slug)
+
+        form = PostImageForm(data={"post": post_obj.id}, files={"image": request.FILES['file']})
         
+        if form.is_valid():
+            postImage_obj: PostImage = form.save()
+            return JsonResponse({
+                "location": postImage_obj.image.url
+            },
+            status= 201
+            )
+        else:
+            return JsonResponse({'error': "Upload failed"}, status= 400)
+    
+    return JsonResponse({'error': "Wrong request"}, status= 403)

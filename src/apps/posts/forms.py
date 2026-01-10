@@ -43,7 +43,7 @@ class ExampleModelForm(forms.ModelForm):
 """
 from django import forms
 from .models import (
-    Post
+    Post, PostImage
 )
 # Create your forms here.
 
@@ -59,3 +59,8 @@ class EditPostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ['title', 'content', 'thumbnail', 'tags', 'is_private']
+
+class PostImageForm(forms.ModelForm):
+    class Meta:
+        model = PostImage
+        fields = ['post', 'image']

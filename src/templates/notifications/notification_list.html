@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block head %}
+<!-- This heading is from notification_list.html  -->
+{% endblock %}
+
+{% block content %}
+
+<div class="max-w-2xl mx-auto px-4 py-6">
+
+    <h2 class="text-2xl font-semibold mb-6 text-gray-800">
+        Notifications
+    </h2>
+
+    {% if page_obj and page_obj.object_list %}
+
+    <ul class="space-y-4">
+        {% for n in page_obj %}
+        <li class="flex items-start justify-between gap-4 p-4 rounded-lg border
+         max-w-xl mx-auto
+         hover:shadow-sm transition
+         {% if not n.is_read %}
+           bg-blue-50 border-blue-200
+         {% else %}
+           bg-white border-gray-200
+         {% endif %}">
+
+            <div class="flex items-start gap-4 min-w-0">
+
+                <!-- Icon -->
+                {% if n.icon %}
+                <img src="{{ n.icon }}" alt="icon" class="w-10 h-10 rounded-full object-cover shrink-0">
+                {% else %}
+                <div class="w-10 h-10 rounded-full bg-gray-200
+                  flex items-center justify-center text-gray-500 shrink-0">
+                    🔔
+                </div>
+                {% endif %}
+
+                <!-- Text -->
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                        {% if not n.is_read %}
+                        <span class="inline-block w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                        {% endif %}
+
+                        <p class="text-sm text-gray-800 font-medium truncate">
+                            {{ n.title }}
+                        </p>
+                    </div>
+
+                    <div class="mt-1 flex items-center gap-3 text-xs text-gray-500">
+                        <span>{{ n.created_at|date:"M d, Y H:i" }}</span>
+
+                        {% if n.link %}
+                        <a href="{{ n.link }}" class="text-blue-600 hover:underline">
+                            View
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <form method="post" action="{% url 'notifications:notification_delete' n.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{request.get_full_path}}">
+                <button type="submit" class="text-sm text-red-500 hover:text-red-700 cursor-pointer">
+                    Delete
+                </button>
+            </form>
+
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Pagination -->
+    <div class="mt-8 flex items-center justify-between">
+
+        <!-- Previous -->
+        <div>
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}"
+                class="px-4 py-2 border rounded-md text-sm text-gray-700 hover:bg-gray-100">
+                ← Previous
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- Page info -->
+        <div class="text-sm text-gray-600">
+            Page
+            <span class="font-medium">{{ page_obj.number }}</span>
+            of
+            <span class="font-medium">{{ page_obj.paginator.num_pages }}</span>
+        </div>
+
+        <!-- Next -->
+        <div>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}"
+                class="px-4 py-2 border rounded-md text-sm text-gray-700 hover:bg-gray-100">
+                Next →
+            </a>
+            {% endif %}
+        </div>
+
+    </div>
+
+    {% else %}
+    <div class="text-center text-gray-500 py-12">
+        No notifications.
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from notification_list.html  -->
+{% endblock %}

@@ -216,6 +216,10 @@
         autosave_interval: '30s',
         a11y_advanced_options: 'true',
         height: '700',
+        images_upload_url: "{% url 'posts:upload_image' post_obj.slug %}",
+        convert_urls: false,       
+        relative_urls: false,      
+        remove_script_host: false 
     });
 </script>
 {% endblock %}

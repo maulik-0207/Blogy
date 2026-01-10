@@ -8,6 +8,8 @@ from .forms import RegisterForm, ProfileForm, ResetPasswordForm, ChangePasswordF
 from django.core.paginator import Paginator
 from apps.posts.models import Post
 from .models import UserFollow
+from apps.notifications.models import NotificationService
+
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -261,6 +263,21 @@ def toggle_follow(request, username):
             request.user.followings_count += 1
             author.followers_count += 1
             messages.success(request, "Author Followed.")
+            is_follow_back = UserFollow.objects.filter(
+                follower=author,
+                following=request.user
+            ).exists()
+
+            if is_follow_back:
+                NotificationService.create_follow_back_notification(
+                    follower=request.user,
+                    following=author
+                )
+            else:
+                NotificationService.create_follow_notification(
+                    follower=request.user,
+                    following=author
+                )
         else:
             userFollow_obj.delete()
             request.user.followings_count -= 1

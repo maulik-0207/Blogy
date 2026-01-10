@@ -347,6 +347,23 @@ class Post(models.Model):
 
         return str(soup), "".join(toc_html)
     
+    def remove_unused_post_images(self):
+        postImage_objs = PostImage.objects.filter(post = self)
+        
+        image_urls = []
+        soup = BeautifulSoup(self.content,'html.parser')
+        img_tags = soup.find_all('img')
+        for img_tag in img_tags:
+            if 'src' in img_tag.attrs:
+                img_url = str(img_tag['src']).split("?")[0]
+                print(img_url)
+                image_urls.append(img_url)
+                
+        for postImage_obj in postImage_objs:
+            print(postImage_obj.image.url)
+            if postImage_obj.image.url not in image_urls:
+                postImage_obj.delete()
+        
     # def clean(self):
     #     super().clean()
 
@@ -461,7 +478,8 @@ class PostView(models.Model):
     )
     
     def __str__(self) -> str:
-        return f"{self.user.usernmae} viewed {self.post.slug}"
+        user = self.user.username if self.user else self.ip_address
+        return f"{user} viewed {self.post.slug}"
     
     class Meta:
         verbose_name = "Post View"

@@ -5,6 +5,8 @@ from .models import Comment, CommentLike
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from apps.notifications.models import NotificationService
+
 
 @login_required
 def create_comment(request, slug):
@@ -32,6 +34,11 @@ def create_comment(request, slug):
                 messages.success(request, "Replied successfully.")
             else:
                 messages.success(request, "Commented successfully.")
+            NotificationService.create_comment_notification(
+                request.user, 
+                comment_obj, 
+                post_obj
+            )
         else:
             messages.warning(request, form.errors['content'][0].replace("This field", ("Reply" if data['parent'] else "Comment")))
 
@@ -62,6 +69,10 @@ def toggle_like(request, comment_id):
         if created:
             comment_obj.likes += 1
             messages.success(request, f"{"Reply" if comment_obj.parent else "Comment" } Liked.")
+            NotificationService.create_comment_like_notification(
+                user=request.user,
+                comment_obj=comment_obj
+            )
         else:
             commentLike_obj.delete()
             comment_obj.likes -= 1
@@ -87,8 +98,8 @@ def delete_comment(request, comment_id):
     if request.method == 'POST':
         post_obj = comment_obj.post
         messages.success(request, f"{"Reply" if comment_obj.parent else "Comment" } Deleted.")
-        comment_obj.delete()
-        post_obj.comments_count -= 1
+        deleted_count, deleted_map = comment_obj.delete()
+        post_obj.comments_count -= deleted_count
         post_obj.save()
         invalid_redirect_urls = [
             '/accounts/logout/',
