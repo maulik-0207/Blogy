@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<!-- This heading is from edit_post_list.html  -->
+{% endblock %}
+
+{% block content %}
+<main class="min-h-screen bg-gray-50 pt-16 pb-16 px-4">
+    <div class="max-w-6xl mx-auto bg-white border rounded-2xl shadow-sm p-8">
+
+        <!-- HEADER -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-xl font-semibold text-gray-900">
+                Edit Post List
+            </h1>
+            <a href="{% url 'post_lists:my_post_lists' %}" class="text-sm text-gray-500 hover:underline">
+                Back
+            </a>
+        </div>
+
+        <!-- EDIT TITLE -->
+        <form method="post" class="mb-10 flex gap-4 items-end">
+            {% csrf_token %}
+            <div class="flex-1">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Title
+                </label>
+                <input type="text" id="title" maxlength="300" name="title" required class="w-full h-11 
+                rounded-lg border border-gray-300 px-4
+                focus:outline-none focus:ring-2 focus:ring-indigo-500" value="{{post_list.title}}">
+            </div>
+            <button class="px-5 py-2 rounded-lg bg-indigo-500 text-white text-sm hover:bg-indigo-600 cursor-pointer">
+                Save
+            </button>
+        </form>
+
+        <!-- ITEMS -->
+        <h2 class="text-sm font-semibold text-gray-700 mb-4">
+            Posts in this list
+        </h2>
+
+        {% if items %}
+        <div class="space-y-3">
+            {% for item in items %}
+            <div class="flex items-center gap-4 border rounded-xl px-5 py-4">
+
+                <!-- ORDER CONTROLS -->
+                <div class="flex flex-col gap-1">
+                    {% if not forloop.first %}
+                    <form method="post" action="{% url 'post_lists:post_list_item_reorder' item.id item.prev_id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="text-gray-400 hover:text-gray-700 cursor-pointer">▲</button>
+                    </form>
+                    {% else %}
+                    <span class="text-gray-200">▲</span>
+                    {% endif %}
+
+                    {% if not forloop.last %}
+                    <form method="post" action="{% url 'post_lists:post_list_item_reorder' item.next_id item.id %}">
+                        {% csrf_token %}
+                        <button class="text-gray-400 hover:text-gray-700 cursor-pointer">▼</button>
+                    </form>
+                    {% else %}
+                    <span class="text-gray-200">▼</span>
+                    {% endif %}
+                </div>
+
+                <!-- POST INFO -->
+                <div class="flex items-center gap-4 flex-1 min-w-0">
+
+                    <div class="w-6 text-right text-xs text-gray-400 shrink-0">
+                        {{ forloop.counter }}.
+                    </div>
+
+                    <!-- THUMBNAIL -->
+                    <a target="_blank" href="{% url 'posts:post_detail' item.post.slug %}"
+                        class="w-28 aspect-video rounded-lg overflow-hidden bg-gray-100 border shrink-0">
+                        {% if item.post.thumbnail %}
+                        <img src="{{ item.post.thumbnail.url }}" alt="{{ item.post.title }}"
+                            class="w-full h-full object-cover">
+                        {% else %}
+                        <div class="w-full h-full flex items-center justify-center text-xs text-gray-400">
+                            No Image
+                        </div>
+                        {% endif %}
+                    </a>
+
+                    <!-- CONTENT -->
+                    <div class="flex-1 min-w-0">
+
+                        <!-- TITLE -->
+                        <a target="_blank" href="{% url 'posts:post_detail' item.post.slug %}"
+                            class="block text-sm font-medium text-gray-900 truncate hover:underline">
+                            {{ item.post.title }}
+                        </a>
+
+                        <!-- META -->
+                        <div class="flex flex-wrap items-center gap-4 text-xs text-gray-500 mt-1">
+
+                            <!-- AUTHOR -->
+                            <a target="_blank"
+                                href="{% url 'acc_public_urls:author_profile' item.post.author.username %}"
+                                class="flex items-center gap-2 hover:underline">
+
+                                {% if item.post.author.profile.image %}
+                                <img src="{{ item.post.author.profile.image.url }}"
+                                    class="w-5 h-5 rounded-full object-cover" alt="{{ item.post.author.username }}">
+                                {% else %}
+                                <div
+                                    class="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-[10px] text-gray-500">
+                                    {{ item.post.author.username|first|upper }}
+                                </div>
+                                {% endif %}
+
+                                <span>{{ item.post.author.username }}</span>
+                            </a>
+
+                            <!-- DATE -->
+                            <span>{{ item.post.created_at|date:"M d, Y" }}</span>
+
+                            <!-- LIKES -->
+                            <span>
+                                {{ item.post.likes_count }} likes
+                            </span>
+
+                            <!-- COMMENTS -->
+                            <span>
+                                {{ item.post.comments_count }} comments
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- REMOVE -->
+                <form method="post" action="{% url 'post_lists:delete_post_list_item' item.pk %}"
+                    onsubmit="return confirm('Remove this post from list?');">
+                    {% csrf_token %}
+                    <button class="text-red-500 text-sm hover:text-red-600 cursor-pointer">
+                        Remove
+                    </button>
+                </form>
+
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-sm text-gray-500">
+            No posts in this list.
+        </p>
+        {% endif %}
+
+    </div>
+</main>
+
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from edit_post_list.html  -->
+{% endblock %}

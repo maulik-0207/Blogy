@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<!-- This heading is from post_list_detail.html  -->
+{% endblock %}
+
+{% block content %}
+<main class="min-h-screen bg-gray-50 pt-16 pb-16 px-4">
+  <div class="max-w-6xl mx-auto">
+
+    <!-- HEADER -->
+    <div class="bg-white border rounded-2xl shadow-sm p-6 mb-8">
+
+      <h1 class="text-2xl font-semibold text-gray-900">
+        {{ post_list.title }}
+      </h1>
+
+      <!-- AUTHOR -->
+      <div class="flex items-center gap-3 mt-4">
+
+        {% if post_list.user.profile.image %}
+          <img src="{{ post_list.user.profile.image.url }}"
+               class="w-10 h-10 rounded-full object-cover"
+               alt="{{ post_list.user.username }}">
+        {% else %}
+          <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+            {{ post_list.user.username|first|upper }}
+          </div>
+        {% endif %}
+
+        <a href="{% url 'acc_public_urls:author_profile' post_list.user.username %}"
+           class="text-sm font-medium hover:underline">
+          {{ post_list.user.username }}
+        </a>
+
+        <span class="text-xs text-gray-500">
+          {{ post_list.created_at|date:"M d, Y" }}
+        </span>
+      </div>
+
+      <!-- LIKE -->
+      <div class="mt-4">
+        <form method="post" action="{% url 'post_lists:toggle_post_list_like' post_list.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button class="flex items-center gap-2 text-sm cursor-pointer
+              {% if is_liked %}
+                text-red-600
+              {% else %}
+                text-gray-600 hover:text-indigo-600
+              {% endif %}">
+            {% if is_liked %}❤️{% else %}🤍{% endif %}
+            <span>{{ post_list.likes }}</span>
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- POSTS -->
+    {% if items %}
+    <div class="space-y-4">
+
+      {% for item in items %}
+      <div class="bg-white border rounded-xl p-4 flex gap-4">
+
+        <!-- THUMBNAIL -->
+        <a target="_blank" href="{% url 'posts:post_detail' item.post.slug %}"
+           class="w-32 aspect-video rounded-lg overflow-hidden bg-gray-100 border shrink-0">
+          {% if item.post.thumbnail %}
+            <img src="{{ item.post.thumbnail.url }}"
+                 class="w-full h-full object-cover"
+                 alt="{{ item.post.title }}">
+          {% else %}
+            <div class="w-full h-full flex items-center justify-center text-xs text-gray-400">
+              No Image
+            </div>
+          {% endif %}
+        </a>
+
+        <!-- CONTENT -->
+        <div class="flex-1 min-w-0">
+
+          <a target="_blank" href="{% url 'posts:post_detail' item.post.slug %}"
+             class="font-medium text-gray-900 truncate block hover:underline">
+            {{ item.post.title }}
+          </a>
+
+          <div class="flex flex-wrap items-center gap-4 text-xs text-gray-500 mt-2">
+
+            <!-- AUTHOR -->
+            <a href="{% url 'acc_public_urls:author_profile' post_list.user.username %}"
+               target="_blank" class="flex items-center gap-2 hover:underline">
+
+              {% if item.post.author.profile_image %}
+                <img src="{{ item.post.author.profile_image.url }}"
+                     class="w-5 h-5 rounded-full object-cover">
+              {% else %}
+                <div class="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-[10px]">
+                  {{ item.post.author.username|first|upper }}
+                </div>
+              {% endif %}
+
+              <span>{{ item.post.author.username }}</span>
+            </a>
+
+            <span>{{ item.post.created_at|date:"M d, Y" }}</span>
+            <span>❤️ {{ item.post.likes_count }}</span>
+            <span>💬 {{ item.post.comments_count }}</span>
+
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+    </div>
+    {% else %}
+      <p class="text-sm text-gray-500">
+        No posts in this list.
+      </p>
+    {% endif %}
+
+    <!-- PAGINATION -->
+    {% if items.has_other_pages %}
+    <div class="flex justify-center mt-10 text-sm gap-3">
+
+      {% if items.has_previous %}
+      <a href="?page={{ items.previous_page_number }}"
+         class="px-3 py-1 border rounded hover:bg-gray-100">
+        Prev
+      </a>
+      {% endif %}
+
+      <span class="text-gray-500">
+        Page {{ items.number }} of {{ items.paginator.num_pages }}
+      </span>
+
+      {% if items.has_next %}
+      <a href="?page={{ items.next_page_number }}"
+         class="px-3 py-1 border rounded hover:bg-gray-100">
+        Next
+      </a>
+      {% endif %}
+
+    </div>
+    {% endif %}
+
+  </div>
+</main>
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from post_list_detail.html  -->
+{% endblock %}

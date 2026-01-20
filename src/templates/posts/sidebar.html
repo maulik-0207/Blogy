@@ -14,5 +14,10 @@
             class="block px-3 py-2 rounded-lg {% if request.path == '/posts/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
             My Posts
         </a>
+
+        <a href="{% url 'post_lists:my_post_lists' %}"
+            class="block px-3 py-2 rounded-lg {% if request.path == '/post-lists/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+            My Post Lists
+        </a>
     </nav>
 </aside>

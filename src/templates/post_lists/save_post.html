@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<!-- This heading is from save_post.html  -->
+{% endblock %}
+
+{% block content %}
+<main class="min-h-screen bg-gray-50 pt-16 pb-16 px-4">
+  <div class="max-w-6xl mx-auto">
+
+    <!-- POST INFO -->
+    <div class="bg-white border rounded-2xl shadow-sm p-6 mb-8 flex gap-6">
+
+      <!-- THUMBNAIL -->
+      <div class="w-40 aspect-video rounded-lg overflow-hidden bg-gray-100 border shrink-0">
+        {% if post.thumbnail %}
+          <img src="{{ post.thumbnail.url }}"
+               class="w-full h-full object-cover"
+               alt="{{ post.title }}">
+        {% else %}
+          <div class="w-full h-full flex items-center justify-center text-sm text-gray-400">
+            No Image
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- CONTENT -->
+      <div class="flex-1 min-w-0">
+        <a href="{% url 'posts:post_detail' post.slug %}"
+           class="text-lg font-semibold text-gray-900 hover:underline truncate block">
+          {{ post.title }}
+        </a>
+
+        <div class="text-sm text-gray-500 mt-2 flex gap-4 flex-wrap">
+          <span>❤️ {{ post.likes_count }}</span>
+          <span>💬 {{ post.comments_count }}</span>
+          <span>{{ post.created_at|date:"M d, Y" }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- POST LIST TABLE -->
+    <div class="bg-white border rounded-2xl shadow-sm overflow-hidden">
+
+      {% if post_lists %}
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-gray-500">
+          <tr>
+            <th class="text-left px-6 py-3">Title</th>
+            <th class="text-center px-6 py-3">Posts</th>
+            <th class="text-right px-6 py-3"></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for pl in post_lists %}
+          <tr class="border-t hover:bg-gray-50">
+            <td class="px-6 py-4 font-medium text-gray-900">
+             <a href="{% url 'post_lists:post_list_detail' pl.id %}"> {{ pl.title }}</a>
+            </td>
+            <td class="px-6 py-4 text-center text-gray-500">
+              {{ pl.post_list_items.count }}
+            </td>
+            <td class="px-6 py-4 text-right">
+              <a href="{% url 'post_lists:edit_post_list' pl.pk %}"
+                 class="inline-flex items-center px-5 py-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600">
+                Edit
+              </a>
+                <a href="{% url 'post_lists:add_post_to_list' post.id pl.id %}?next={{request.get_full_path}}"
+                 class="inline-flex items-center px-5 py-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600">
+                Add
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+        <p class="text-sm text-gray-500 p-6">
+          You don’t have any post lists yet.
+        </p>
+      {% endif %}
+
+      <!-- PAGINATION -->
+      {% if post_lists.has_other_pages %}
+      <div class="px-6 py-4 border-t flex justify-center text-sm gap-3">
+
+        {% if post_lists.has_previous %}
+        <a href="?page={{ post_lists.previous_page_number }}"
+           class="px-3 py-1 border rounded hover:bg-gray-100">
+          Prev
+        </a>
+        {% endif %}
+
+        <span class="text-gray-500">
+          Page {{ post_lists.number }} of {{ post_lists.paginator.num_pages }}
+        </span>
+
+        {% if post_lists.has_next %}
+        <a href="?page={{ post_lists.next_page_number }}"
+           class="px-3 py-1 border rounded hover:bg-gray-100">
+          Next
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from save_post.html  -->
+{% endblock %}

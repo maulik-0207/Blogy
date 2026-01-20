@@ -47,7 +47,6 @@ from uuid import uuid4
 from django.db import models
 from apps.posts.models import Post
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 # Create your models here.
 
 
@@ -92,7 +91,9 @@ class PostList(models.Model):
     )
     
     updated_at = models.DateTimeField(
-        verbose_name= "Updated At"
+        verbose_name= "Updated At",
+        null= True,
+        blank= True
     )
     
     def __str__(self) -> str:

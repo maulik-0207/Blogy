@@ -50,6 +50,7 @@ from django.contrib.auth import get_user_model
 from apps.comments.models import Comment
 from django.urls import reverse_lazy
 from apps.posts.models import Post
+from apps.post_lists.models import PostList
 # Create your models here.
 
 
@@ -164,6 +165,20 @@ class NotificationService:
             link=reverse_lazy(
                 "posts:post_detail",
                 kwargs={"slug": post_obj.slug}
+            )
+        )
+        
+    @staticmethod
+    def create_post_list_like_notification(user, post_list: PostList):
+        if post_list.user == user:
+            return  # no self-like notification
+
+        Notification.objects.create(
+            user=post_list.user,
+            title=f"{user.username} liked your post list",
+            link=reverse_lazy(
+                "post_lists:post_list_detail",
+                kwargs={"pk": post_list.id}
             )
         )
 

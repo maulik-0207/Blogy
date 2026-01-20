@@ -27,7 +27,7 @@ urlpatterns = [
     path('',include('apps.accounts.public_urls')),
     path('posts/',include('apps.posts.urls')),
     path('comments/',include('apps.comments.urls')),
-    path('post_lists/',include('apps.post_lists.urls')),
+    path('post-lists/',include('apps.post_lists.urls')),
     path('notifications/',include('apps.notifications.urls')),
     path('reports/',include('apps.reports.urls')),
 ]

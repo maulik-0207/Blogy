@@ -42,6 +42,10 @@ class ExampleModelForm(forms.ModelForm):
         pass
 """
 from django import forms
-from .models import *  
+from .models import PostList
 # Create your forms here.
 
+class PostListForm(forms.ModelForm):
+    class Meta:
+        model = PostList
+        fields = ["title"]

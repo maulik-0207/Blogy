@@ -157,6 +157,18 @@
                         💬 {{ post_obj.comments_count }}
                     </span>
 
+                    {% if request.user.is_authenticated %}
+                    <a href="{% url 'post_lists:save_post' post_obj.id %}"
+                        class="flex items-center gap-1 text-gray-600 hover:text-indigo-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 5h14M5 12h14M5 19h14" />
+                        </svg>
+                        <span class="text-sm">Save</span>
+                    </a>
+                    {% endif %}
+
                 </div>
 
                 <!-- TAGS -->
@@ -202,7 +214,7 @@
             {% if request.user.is_authenticated %}
             <form method="post" action="{% url 'comments:create_comment' post_obj.slug %}" class="mb-10">
                 {% csrf_token %}
-                
+
                 <input type="hidden" name="next" value="{{request.get_full_path}}">
 
                 <textarea name="content" rows="3" required placeholder="Write a comment..." class="w-full rounded-xl border border-gray-300 px-4 py-3
@@ -232,10 +244,12 @@
 
                 <div class="space-y-5">
                     {% for comment in user_comments %}
-                    {% include "comments/comment_item.html" with comment=comment reply_lvl=0 max_reply_lvl=2 slice_lvl=1 %}
-                        {% if forloop.last %}
-                            <a href="{% url 'comments:my_comments' post_obj.slug %}" class="text-indigo-600 underline text-sm">More Comments..</a>
-                        {% endif %}
+                    {% include "comments/comment_item.html" with comment=comment reply_lvl=0 max_reply_lvl=2 slice_lvl=1
+                    %}
+                    {% if forloop.last %}
+                    <a href="{% url 'comments:my_comments' post_obj.slug %}"
+                        class="text-indigo-600 underline text-sm">More Comments..</a>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -250,9 +264,10 @@
                 <div class="space-y-5">
                     {% for comment in comments %}
                     {% include "comments/comment_item.html" with comment=comment reply_lvl=0 max_reply_lvl=2 slice_lvl=1 %}
-                        {% if forloop.last %}
-                            <a href="{% url 'comments:all_comments' post_obj.slug %}" class="text-indigo-600 underline text-sm">More Comments..</a>
-                        {% endif %}
+                    {% if forloop.last %}
+                    <a href="{% url 'comments:all_comments' post_obj.slug %}"
+                        class="text-indigo-600 underline text-sm">More Comments..</a>
+                    {% endif %}
                     {% empty %}
                     <p class="text-sm text-gray-500">
                         No comments yet.
