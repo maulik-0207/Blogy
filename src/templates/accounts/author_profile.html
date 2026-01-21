@@ -60,7 +60,18 @@
                         {% endif %}
                     </form>
                     {% endif %}
+                    {% if request.user.is_authenticated and request.user != author %}
+                    <a href="{% url 'reports:report_user' author.username %}" title="Report user"
+                        class="text-gray-400 hover:text-red-600 transition">
 
+                        <!-- Flag icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 3v18M5 3h10l-1 4 1 4H5" />
+                        </svg>
+                    </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -89,6 +100,13 @@
                 About
             </a>
             {% endif %}
+
+            {% if author.post_lists.all %}
+            <a href="?filter=post_lists" class="px-4 py-2 rounded-full text-sm border
+              {% if filter == 'post_lists' %}bg-indigo-500 text-white{% else %}bg-white{% endif %}">
+                Post Lists
+            </a>
+            {% endif %}
         </div>
 
         {% if filter == 'About' %}
@@ -97,6 +115,27 @@
                 {{author.bio}}
 
             </p>
+        </div>
+        {% elif filter == 'post_lists' %}
+        <div class="space-y-4">
+            {% for pl in page_obj %}
+            <div class="flex items-center justify-between border rounded-xl px-6 py-4 hover:bg-gray-50">
+
+                <!-- TITLE -->
+                <div class="min-w-0">
+                    <a href="{% url 'post_lists:post_list_detail' pl.id %}"
+                        class="font-medium text-gray-900 truncate hover:underline">
+                        {{ pl.title }}
+                    </a>
+
+                    <div class="flex gap-4 text-xs text-gray-500 mt-1">
+                        <span>{{ pl.posts_count }} posts</span>
+                        <span>{{ pl.likes_count }} likes</span>
+                        <span>{{ pl.created_at|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
         {% elif page_obj %}
         <div class="space-y-4">

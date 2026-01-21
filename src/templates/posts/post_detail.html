@@ -169,6 +169,19 @@
                     </a>
                     {% endif %}
 
+                    <a href="{% url 'reports:report_post' post_obj.slug %}"
+                        class="flex items-center gap-1 text-gray-600 hover:text-red-600">
+
+                        <!-- Flag icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 3v18M5 3h10l-1 4 1 4H5" />
+                        </svg>
+
+                        <span>Report</span>
+                    </a>
+
                 </div>
 
                 <!-- TAGS -->

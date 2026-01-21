@@ -42,6 +42,21 @@ class ExampleModelForm(forms.ModelForm):
         pass
 """
 from django import forms
-from .models import *  
+from .models import PostReport, CommentReport, UserReport
 # Create your forms here.
 
+
+class PostReportForm(forms.ModelForm):
+    class Meta:
+        model = PostReport
+        fields = ['reported_by', 'reported_post', 'subject', 'description']
+
+class CommentReportForm(forms.ModelForm):
+    class Meta:
+        model = CommentReport
+        fields = ['reported_by', 'reported_comment', 'subject', 'description']
+        
+class UserReportForm(forms.ModelForm):
+    class Meta:
+        model = UserReport
+        fields = ['reported_by', 'reported_to', 'subject', 'description']

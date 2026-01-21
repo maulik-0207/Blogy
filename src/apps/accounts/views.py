@@ -9,6 +9,8 @@ from django.core.paginator import Paginator
 from apps.posts.models import Post
 from .models import UserFollow
 from apps.notifications.models import NotificationService
+from django.db.models import Count
+from apps.post_lists.models import PostList
 
 
 def login_view(request):
@@ -216,7 +218,8 @@ def author_profile(request, username):
         .prefetch_related("post_tags__tag")
         .order_by("-created_at")
     )
-
+    post_lists = None
+    
     if request.user != author:
         post_objs = post_objs.filter(is_private=False)
 
@@ -227,8 +230,13 @@ def author_profile(request, username):
 
     elif filter_type == "popular":
         post_objs = post_objs.order_by("-likes_count")
-
-    paginator = Paginator(post_objs, 10) 
+    elif filter_type == "post_lists":
+        post_lists = PostList.objects.annotate(
+            likes_count=Count("list_likes", distinct=True),
+            posts_count=Count("post_list_items", distinct=True),
+        ).filter(user = author)
+    
+    paginator = Paginator(post_objs if not post_lists else post_lists, 10) 
     page_number = request.GET.get("page", 1)
     page_obj = paginator.get_page(page_number)
 

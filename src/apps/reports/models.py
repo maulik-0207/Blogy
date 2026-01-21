@@ -48,7 +48,6 @@ from django.db import models
 from apps.posts.models import Post
 from apps.comments.models import Comment
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 # Create your models here.
 
 
@@ -133,6 +132,12 @@ class UserReport(models.Model):
         verbose_name = "User Report"
         verbose_name_plural = "User Reports"
         ordering = ["-created_at",]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["reported_by", "reported_to"],
+                name="unique_user_user_report"
+            )
+        ]
     
 class PostReport(models.Model):
     
@@ -215,6 +220,12 @@ class PostReport(models.Model):
         verbose_name = "Post Report"
         verbose_name_plural = "Post Reports"
         ordering = ["-created_at",]
+        constraints = [
+        models.UniqueConstraint(
+                fields=["reported_by", "reported_post"],
+                name="unique_user_post_report"
+            )
+        ]
 
 class CommentReport(models.Model):
     
@@ -297,3 +308,9 @@ class CommentReport(models.Model):
         verbose_name = "Comment Report"
         verbose_name_plural = "Comment Reports"
         ordering = ["-created_at",]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["reported_by", "reported_comment"],
+                name="unique_user_comment_report"
+            )
+        ]

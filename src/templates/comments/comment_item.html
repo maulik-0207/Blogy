@@ -53,6 +53,26 @@
         </button>
         {% endif %}
 
+        {% if request.user.is_authenticated and comment.user != request.user %}
+            <a href="{% url 'reports:report_comment' comment.id %}?next={{request.get_full_path}}"
+            class="flex items-center gap-1 hover:text-red-600 transition cursor-pointer">
+
+            <!-- Flag icon -->
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 3v18M5 3h10l-1 4 1 4H5" />
+            </svg>
+
+            <span>Report</span>
+            </a>
+        {% endif %}
+
     </div>
     {% if max_reply_lvl > reply_lvl %}
     <div id="reply-form-{{ comment.id }}" class="hidden mt-4">

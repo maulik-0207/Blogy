@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<!-- This heading is from report_user.html  -->
+{% endblock %}
+
+{% block content %}
+<main class="min-h-screen bg-gray-50 pt-16 pb-16 px-4">
+    <div class="max-w-2xl mx-auto">
+        
+        <div class="bg-white border rounded-2xl shadow-sm p-6">
+            
+            <!-- HEADER -->
+            <h1 class="text-xl font-semibold text-gray-900 mb-2">
+                Report User
+            </h1>
+            
+            <p class="text-sm text-gray-500 mb-2 mt-5">
+                Reporting User:
+            </p>
+            <div class="bg-white border border-gray-200 rounded-2xl p-6 mb-8">
+            <div class="flex flex-col sm:flex-row gap-6 sm:items-center sm:justify-between">
+
+                <div class="flex items-center gap-4">
+                    <!-- Avatar -->
+                    {% if user_obj.profile_image %}
+                    <img src="{{ user_obj.profile_image.url }}" class="h-20 w-20 rounded-full object-cover border">
+                    {% else %}
+                    <div class="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                        NA
+                    </div>
+                    {% endif %}
+
+                    <!-- Info -->
+                    <div>
+                        <h1 class="text-xl font-semibold text-gray-900">
+                            {{ user_obj.username }}
+                        </h1>
+                        {% if user_obj.name %}
+                        <p class="text-sm text-gray-600">{{ user_obj.name }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Stats + Action -->
+                <div class="flex items-center gap-6">
+
+                    <div class="text-center">
+                        <p class="text-lg font-semibold">{{ user_obj.followers_count }}</p>
+                        <p class="text-xs text-gray-500">Followers</p>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="text-lg font-semibold">{{ user_obj.followings_count }}</p>
+                        <p class="text-xs text-gray-500">Following</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+            <!-- FORM -->
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- SUBJECT -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Subject <span class="text-red-500">*</span>
+                    </label>
+
+                    <input type="text" name="subject" value="{{ form.subject.value|default_if_none:'' }}" required maxlength="400"
+                        placeholder="Why are you reporting this user?"
+                        class="w-full h-11 rounded-lg border border-gray-300 px-4
+                                      focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <!-- DESCRIPTION -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Description (optional)
+                    </label>
+
+                    <textarea name="description" rows="10" maxlength="1000"
+                        placeholder="Provide additional details (optional)"
+                        class="w-full h-36 rounded-lg border border-gray-300 px-4
+                                      focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ form.description.value|default_if_none:'' }}</textarea>
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="flex items-center gap-4">
+                    <button type="submit" class="px-6 py-2 rounded-lg bg-red-600 text-white text-sm hover:bg-red-700 cursor-pointer">
+                        Submit Report
+                    </button>
+
+                    <a href="{% url 'acc_public_urls:author_profile' user_obj.username %}" class="text-sm text-gray-500 hover:underline">
+                        Cancel
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+</main>
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from report_user.html  -->
+{% endblock %}
