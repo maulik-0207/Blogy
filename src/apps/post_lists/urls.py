@@ -5,6 +5,7 @@ app_name = "post_lists"
 
 urlpatterns = [
     path('', views.my_post_lists, name='my_post_lists'),
+    path('liked/', views.my_liked_post_lists, name='my_liked_post_lists'),
     path("<uuid:pk>/", views.post_list_detail, name="post_list_detail"),
     path("<uuid:pk>/like/", views.toggle_post_list_like, name="toggle_post_list_like"),
     path('save-post/<uuid:post_pk>/', views.save_post, name='save_post'),

@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<!-- This heading is from index.html  -->
+{% endblock %}
+
+{% block content %}
+<main class="min-h-screen bg-gray-50 pt-16 pb-16 px-4">
+    <div class="max-w-6xl mx-auto">
+
+        <!-- SEARCH BAR -->
+        <form method="get" class="mb-8 bg-white border rounded-2xl p-4 shadow-sm">
+
+            <!-- SEARCH INPUT -->
+            <div class="flex gap-3">
+                <input required type="text" name="q" value="{{ query }}" placeholder="Search posts, lists, authors..." class="flex-1 rounded-xl border-gray-300 px-4 py-2
+                  focus:ring-indigo-500 focus:border-indigo-500">
+                <input type="hidden" name="type" value="{{request.GET.type}}">
+                <button type="submit" class="px-6 py-2 rounded-xl bg-indigo-500 text-white
+                   hover:bg-indigo-600 transition cursor-pointer">
+                    Search
+                </button>
+            </div>
+
+            <!-- FILTERS -->
+            <div class="flex flex-wrap gap-2 mt-4">
+
+                <a href="{% url 'main:search' %}?q={{ query }}&type=all" class="px-4 py-1.5 rounded-full text-sm border transition
+     {% if content_type == 'all' %}
+       bg-indigo-500 text-white border-indigo-500
+     {% else %}
+       hover:bg-gray-100
+     {% endif %}">
+                    All
+                </a>
+
+                <a href="{% url 'main:search' %}?q={{ query }}&type=posts" class="px-4 py-1.5 rounded-full text-sm border transition
+     {% if content_type == 'posts' %}
+       bg-indigo-500 text-white border-indigo-500
+     {% else %}
+       hover:bg-gray-100
+     {% endif %}">
+                    Posts
+                </a>
+
+                <a href="{% url 'main:search' %}?q={{ query }}&type=lists" class="px-4 py-1.5 rounded-full text-sm border transition
+     {% if content_type == 'lists' %}
+       bg-indigo-500 text-white border-indigo-500
+     {% else %}
+       hover:bg-gray-100
+     {% endif %}">
+                    Post Lists
+                </a>
+
+                <a href="{% url 'main:search' %}?q={{ query }}&type=authors" class="px-4 py-1.5 rounded-full text-sm border transition
+     {% if content_type == 'authors' %}
+       bg-indigo-500 text-white border-indigo-500
+     {% else %}
+       hover:bg-gray-100
+     {% endif %}">
+                    Authors
+                </a>
+
+            </div>
+
+        </form>
+
+        <!-- RESULTS -->
+        {% if results %}
+        <div class="space-y-4">
+
+            {% for item in results %}
+
+            {% if item.feed_type == "post" %}
+            {% include "posts/post_item.html" with post=item %}
+            {% elif item.feed_type == "post_list" %}
+            {% include "post_lists/post_list_item.html" with post_list=item %}
+            {% elif item.feed_type == "author" %}
+            <div class="bg-white border rounded-xl p-4 flex items-center gap-4">
+
+                {% if item.profile_image %}
+                <img src="{{ item.profile_image.url }}" class="w-12 h-12 rounded-full object-cover">
+                {% else %}
+                <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                    {{ item.username|first|upper }}
+                </div>
+                {% endif %}
+
+                <div>
+                    <a href="{% url 'acc_public_urls:author_profile' item.username %}"
+                        class="font-medium hover:underline">
+                        {{ item.username }}
+                    </a>
+                    <p class="text-xs text-gray-500">
+                        {{ item.followers_count }} followers
+                    </p>
+                </div>
+
+            </div>
+            {% endif %}
+
+            {% endfor %}
+        </div>
+        {% else %}
+        {% if query %}
+        <p class="text-sm text-gray-500">No results found.</p>
+        {% endif %}
+        {% endif %}
+
+        <!-- PAGINATION -->
+        {% if results.has_other_pages %}
+        <div class="flex justify-center mt-10 gap-3 text-sm">
+
+            {% if results.has_previous %}
+            <a href="?q={{ query }}&type={{ content_type }}&page={{ results.previous_page_number }}"
+                class="px-3 py-1 border rounded hover:bg-gray-100">
+                Prev
+            </a>
+            {% endif %}
+
+            <span class="text-gray-500">
+                Page {{ results.number }} of {{ results.paginator.num_pages }}
+            </span>
+
+            {% if results.has_next %}
+            <a href="?q={{ query }}&type={{ content_type }}&page={{ results.next_page_number }}"
+                class="px-3 py-1 border rounded hover:bg-gray-100">
+                Next
+            </a>
+            {% endif %}
+
+        </div>
+        {% endif %}
+
+    </div>
+</main>
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from index.html  -->
+{% endblock %}

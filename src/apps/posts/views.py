@@ -220,6 +220,30 @@ def toggle_like(request, slug):
     else:
         return redirect("posts:post_detail", slug)
 
+@login_required
+def liked_posts(request):
+    post_objs = (
+        Post.objects
+        .filter(
+            likes__user=request.user,
+            is_private=False,
+            is_banned=False,
+        )
+        .select_related("author")
+        .distinct()
+        .order_by("-likes__created_at")
+    )
+    
+    paginator = Paginator(post_objs, 10)
+    page_number = request.GET.get("page", 1)
+    page_obj = paginator.get_page(page_number)
+    
+    ctx = {
+        "title": "Liked Posts | Blogy",
+        "post_objs" : page_obj
+    }
+    return render(request, "posts/liked_posts.html", context= ctx)
+
 @csrf_exempt
 @login_required
 def upload_image(request, slug):

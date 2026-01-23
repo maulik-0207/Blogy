@@ -4,8 +4,6 @@ DEBUG = True
 
 INSTALLED_APPS += [
     'debug_toolbar',
-    "tailwind",
-    "apps.theme",
     "django_browser_reload"
 ]
 

@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<!-- This heading is from my_liked_post_lists.html  -->
+{% endblock %}
+
+{% block content %}
+<main class="min-h-screen bg-gray-50 pt-16 pb-16 px-4">
+    <div class="w-full max-w-7xl mx-auto px-4">
+
+        <div class="flex flex-col md:flex-row bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+
+            <!-- SIDEBAR -->
+            {% include 'posts/sidebar.html' %}
+
+            <!-- MAIN CONTENT -->
+            <section class="flex-1 p-8">
+
+        <!-- HEADER -->
+        <div class="mb-8">
+          <h1 class="text-2xl font-semibold text-gray-900">
+            My Liked Post Lists
+          </h1>
+        </div>
+
+        <!-- LIST -->
+        {% if post_lists %}
+        <div class="space-y-3">
+
+          {% for pl in post_lists %}
+          <div class="flex items-center justify-between border rounded-xl px-6 py-4 hover:bg-gray-50">
+
+            <!-- TITLE -->
+            <div class="min-w-0">
+              <a href="{% url 'post_lists:post_list_detail' pl.id %}"
+                 class="font-medium text-gray-900 truncate hover:underline">
+                {{ pl.title }}
+              </a>
+
+              <div class="flex gap-4 text-xs text-gray-500 mt-1">
+                <span>{{ pl.posts_count }} posts</span>
+                <span>{{ pl.likes_count }} likes</span>
+                <span>{{ pl.created_at|date:"M d, Y" }}</span>
+              </div>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="flex items-center gap-4 text-sm">
+              <a href="{% url 'post_lists:edit_post_list' pl.pk %}"
+                 class="text-gray-600 hover:text-gray-900">
+                Edit
+              </a>
+              <a href="{% url 'post_lists:delete_post_list' pl.pk %}"
+                 class="text-red-500 hover:text-red-600">
+                Delete
+              </a>
+            </div>
+
+          </div>
+          {% endfor %}
+
+        </div>
+        {% else %}
+          <div class="text-center py-20 text-sm text-gray-500">
+            You haven’t liked any post lists yet.
+          </div>
+        {% endif %}
+
+        <!-- PAGINATION -->
+        {% if post_lists.has_other_pages %}
+        <div class="flex justify-center mt-10">
+          <nav class="flex items-center gap-2 text-sm">
+
+            {% if post_lists.has_previous %}
+            <a href="?page={{ post_lists.previous_page_number }}"
+               class="px-3 py-1 rounded border hover:bg-gray-100">
+              Prev
+            </a>
+            {% endif %}
+
+            <span class="px-3 py-1 text-gray-500">
+              Page {{ post_lists.number }} of {{ post_lists.paginator.num_pages }}
+            </span>
+
+            {% if post_lists.has_next %}
+            <a href="?page={{ post_lists.next_page_number }}"
+               class="px-3 py-1 rounded border hover:bg-gray-100">
+              Next
+            </a>
+            {% endif %}
+
+          </nav>
+        </div>
+        {% endif %}
+
+      </section>
+        </div>
+    </div>
+</main>
+
+{% endblock %}
+
+{% block script %}
+<!-- This Script is from my_liked_post_lists.html  -->
+{% endblock %}

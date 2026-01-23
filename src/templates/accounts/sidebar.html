@@ -6,7 +6,7 @@
     <nav class="space-y-1 text-sm">
 
         <a href="{% url 'accounts:edit_profile' %}"
-            class="block px-3 py-2 rounded-lg font-medium {% if request.path == '/accounts/edit-profile/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+            class="block px-3 py-2 rounded-lg {% if request.path == '/accounts/edit-profile/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
             Edit Profile
         </a>
 

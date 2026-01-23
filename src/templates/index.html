@@ -5,7 +5,94 @@
 {% endblock %}
 
 {% block content %}
-<h1>This is index page of Blogy</h1>
+<main class="min-h-screen bg-gray-50 pt-16 pb-16 px-4">
+  <div class="max-w-7xl mx-auto flex gap-8">
+
+    <!-- FEED -->
+    <div class="flex-1 space-y-6">
+
+      {% if feed %}
+        {% for item in feed %}
+
+          {% if item.feed_type == "post" %}
+            {% include "posts/post_item.html" with post=item %}
+          {% elif item.feed_type == "post_list" %}
+            {% include "post_lists/post_list_item.html" with post_list=item %}
+          {% endif %}
+
+        {% endfor %}
+      {% else %}
+        <p class="text-sm text-gray-500">
+          No posts yet. Follow authors to see content here.
+        </p>
+      {% endif %}
+
+      <!-- PAGINATION -->
+      {% if feed.has_other_pages %}
+      <div class="flex justify-center mt-8 text-sm gap-3">
+
+        {% if feed.has_previous %}
+        <a href="?page={{ feed.previous_page_number }}"
+           class="px-3 py-1 border rounded hover:bg-gray-100">
+          Prev
+        </a>
+        {% endif %}
+
+        <span class="text-gray-500">
+          Page {{ feed.number }} of {{ feed.paginator.num_pages }}
+        </span>
+
+        {% if feed.has_next %}
+        <a href="?page={{ feed.next_page_number }}"
+           class="px-3 py-1 border rounded hover:bg-gray-100">
+          Next
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="w-72 hidden lg:block">
+
+      <div class="bg-white border rounded-xl p-4">
+        <h3 class="text-sm font-semibold text-gray-700 mb-4">
+          Trending Authors
+        </h3>
+
+        <div class="space-y-3">
+          {% for author in trending_authors %}
+          <a href="{% url 'acc_public_urls:author_profile' author.username %}"
+             class="flex items-center gap-3 hover:bg-gray-50 p-2 rounded-lg">
+
+            {% if author.profile_image %}
+              <img src="{{ author.profile_image.url }}"
+                   class="w-8 h-8 rounded-full object-cover">
+            {% else %}
+              <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs">
+                {{ author.username|first|upper }}
+              </div>
+            {% endif %}
+
+            <div>
+              <p class="text-sm font-medium">
+                {{ author.username }}
+              </p>
+              <p class="text-xs text-gray-500">
+                {{ author.followers_count }} followers
+              </p>
+            </div>
+
+          </a>
+          {% endfor %}
+        </div>
+
+      </div>
+    </aside>
+
+  </div>
+</main>
 {% endblock %}
 
 {% block script %}

@@ -1,0 +1,70 @@
+<div class="bg-white border rounded-2xl shadow-sm p-5 hover:bg-gray-50 transition">
+
+    <div class="flex gap-5">
+
+        <!-- THUMBNAIL -->
+        <a href="{% url 'posts:post_detail' post.slug %}"
+            class="w-44 aspect-video rounded-lg overflow-hidden bg-gray-100 border shrink-0">
+            {% if post.thumbnail %}
+            <img src="{{ post.thumbnail.url }}" alt="{{ post.title }}" class="w-full h-full object-cover">
+            {% else %}
+            <div class="w-full h-full flex items-center justify-center text-xs text-gray-400">
+                No Image
+            </div>
+            {% endif %}
+        </a>
+
+        <!-- CONTENT -->
+        <div class="flex-1 min-w-0">
+
+            <!-- TITLE -->
+            <a href="{% url 'posts:post_detail' post.slug %}"
+                class="block text-lg font-semibold text-gray-900 hover:underline truncate">
+                {{ post.title }}
+            </a>
+
+            <!-- META -->
+            <div class="flex items-center gap-4 text-sm text-gray-500 mt-2 flex-wrap">
+
+                <!-- AUTHOR -->
+                <a href="{% url 'acc_public_urls:author_profile' post.author.username %}"
+                    class="flex items-center gap-2 hover:underline">
+
+                    {% if post.author.profile_image %}
+                    <img src="{{ post.author.profile_image.url }}" class="w-6 h-6 rounded-full object-cover">
+                    {% else %}
+                    <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs">
+                        {{ post.author.username|first|upper }}
+                    </div>
+                    {% endif %}
+
+                    <span>{{ post.author.username }}</span>
+                </a>
+
+                <span>{{ post.created_at|date:"M d, Y" }}</span>
+                <span>❤️ {{ post.likes_count }}</span>
+                <span>💬 {{ post.comments_count }}</span>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="flex items-center gap-6 mt-4 text-sm text-gray-600">
+
+                {% if request.user.is_authenticated %}
+                <a href="{% url 'post_lists:save_post' post.id %}"
+                    class="flex items-center gap-1 hover:text-indigo-600">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M5 5h14M5 12h14M5 19h14" />
+                    </svg>
+
+                    <span>Save</span>
+                </a>
+                {% endif %}
+
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -63,7 +63,7 @@
             </td>
             <td class="px-6 py-4 text-right">
               <a href="{% url 'post_lists:edit_post_list' pl.pk %}"
-                 class="inline-flex items-center px-5 py-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600">
+                 class="inline-flex items-center px-5 py-2 rounded-lg border border-indigo-500 text-indigo-500 hover:bg-indigo-600 hover:text-white">
                 Edit
               </a>
                 <a href="{% url 'post_lists:add_post_to_list' post.id pl.id %}?next={{request.get_full_path}}"

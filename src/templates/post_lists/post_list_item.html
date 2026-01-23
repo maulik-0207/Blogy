@@ -1,0 +1,48 @@
+<div class="bg-white border rounded-2xl shadow-sm p-5 hover:bg-gray-50 transition">
+
+  <div class="flex gap-5">
+
+    <!-- CONTENT -->
+    <div class="flex-1 min-w-0">
+
+      <!-- TITLE -->
+      <a href="{% url 'post_lists:post_list_detail' post_list.id %}"
+         class="block text-lg font-semibold text-gray-900 hover:underline truncate">
+        {{ post_list.title }}
+      </a>
+
+      <!-- META -->
+      <div class="flex items-center gap-4 text-sm text-gray-500 mt-2 flex-wrap">
+
+        <!-- AUTHOR -->
+        <a href="{% url 'acc_public_urls:author_profile' post_list.user.username %}"
+           class="flex items-center gap-2 hover:underline">
+
+          {% if post_list.user.profile_image %}
+            <img src="{{ post_list.user.profile_image.url }}"
+                 class="w-6 h-6 rounded-full object-cover">
+          {% else %}
+            <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs">
+              {{ post_list.user.username|first|upper }}
+            </div>
+          {% endif %}
+
+          <span>{{ post_list.user.username }}</span>
+        </a>
+
+        <span>{{ post_list.posts_count }} posts</span>
+        <span>❤️ {{ post_list.likes }}</span>
+        <span>{{ post_list.created_at|date:"M d, Y" }}</span>
+      </div>
+
+      <!-- LABEL -->
+      <div class="mt-4">
+        <span class="inline-flex items-center px-3 py-1 rounded-full
+                     bg-indigo-50 text-indigo-600 text-xs font-medium">
+          📂 Post List
+        </span>
+      </div>
+
+    </div>
+  </div>
+</div>

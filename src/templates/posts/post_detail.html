@@ -4,6 +4,60 @@
 
 {% block head %}
 <!-- This heading is from post_detail.html  -->
+<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{% url 'posts:post_detail' post_obj.slug %}">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ post_obj.title }}">
+<meta property="og:description" content="{{ post_obj.content|striptags|truncatechars:200 }}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+{% if post_obj.thumbnail %}
+<meta property="og:image" content="{{ post_obj.thumbnail.url }}">
+{% endif %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ post_obj.title }}">
+<meta name="twitter:description" content="{{ post_obj.content|striptags|truncatechars:200 }}">
+{% if post_obj.thumbnail %}
+<meta name="twitter:image" content="{{ post_obj.thumbnail.url }}">
+{% endif %}
+<meta property="article:author" content="{{ post_obj.author.username }}">
+<meta property="article:published_time" content="{{ post_obj.created_at|date:'c' }}">
+<meta property="article:modified_time" content="{{ post_obj.updated_at|date:'c' }}">
+{% if post_obj.is_private or post_obj.is_banned %}
+<meta name="robots" content="noindex, nofollow">
+{% endif %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "{{ post_obj.title|escapejs }}",
+  "description": "{{ post_obj.content|striptags|truncatechars:200|escapejs }}",
+  "datePublished": "{{ post_obj.created_at|date:'c' }}",
+  "dateModified": "{{ post_obj.updated_at|date:'c' }}",
+  "author": {
+    "@type": "Person",
+    "name": "{{ post_obj.author.username|escapejs }}",
+    "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'acc_public_urls:author_profile' post_obj.author.username %}"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Blogy",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/favicon.ico' %}"
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ request.build_absolute_uri }}"
+  }
+  {% if post_obj.thumbnail %}
+  ,
+  "image": [
+    "{{ post_obj.thumbnail.url }}"
+  ]
+  {% endif %}
+}
+</script>
+
 <style>
     .article-content pre {
         background-color: #0f172a;
@@ -257,8 +311,7 @@
 
                 <div class="space-y-5">
                     {% for comment in user_comments %}
-                    {% include "comments/comment_item.html" with comment=comment reply_lvl=0 max_reply_lvl=2 slice_lvl=1
-                    %}
+                    {% include "comments/comment_item.html" with comment=comment reply_lvl=0 max_reply_lvl=2 slice_lvl=1 %}
                     {% if forloop.last %}
                     <a href="{% url 'comments:my_comments' post_obj.slug %}"
                         class="text-indigo-600 underline text-sm">More Comments..</a>

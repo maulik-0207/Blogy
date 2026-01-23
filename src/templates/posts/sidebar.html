@@ -6,7 +6,7 @@
     <nav class="space-y-1 text-sm">
 
         <a href="{% url 'posts:create_post' %}"
-            class="block px-3 py-2 rounded-lg font-medium {% if request.path == '/posts/create/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+            class="block px-3 py-2 rounded-lg {% if request.path == '/posts/create/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
             Create New Post
         </a>
 
@@ -18,6 +18,16 @@
         <a href="{% url 'post_lists:my_post_lists' %}"
             class="block px-3 py-2 rounded-lg {% if request.path == '/post-lists/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
             My Post Lists
+        </a>
+
+        <a href="{% url 'posts:liked_posts' %}"
+            class="block px-3 py-2 rounded-lg {% if request.path == '/posts/liked/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+            My Liked Post
+        </a>
+
+        <a href="{% url 'post_lists:my_liked_post_lists' %}"
+            class="block px-3 py-2 rounded-lg {% if request.path == '/post-lists/liked/' %}bg-indigo-100 text-indigo-600{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+            My Liked Post List
         </a>
     </nav>
 </aside>

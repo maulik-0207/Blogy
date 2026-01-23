@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /accounts/
+Disallow: /posts/create/
+Allow: /
+
+Sitemap: http://127.0.0.1:8000.com/sitemap.xml

@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'django.contrib.sitemaps',
+    
     'apps.main',
     'apps.accounts',
     'apps.posts',
@@ -57,8 +58,9 @@ INSTALLED_APPS = [
     'apps.reports',
     
     'django_celery_results',
-    
-    
+    "tailwind",
+    "apps.theme",
+
 ]
 
 MIDDLEWARE = [

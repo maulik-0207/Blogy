@@ -47,6 +47,29 @@ def my_post_lists(request):
     return render(request, "post_lists/my_post_lists.html", ctx)
 
 @login_required
+def my_liked_post_lists(request):
+
+    qs = (
+        PostList.objects
+        .filter(list_likes__user = request.user)
+        .annotate(
+            posts_count=Count("post_list_items", distinct=True)
+        )
+        .order_by("-list_likes__created_at")
+    )
+
+    paginator = Paginator(qs, 10)
+    page_number = request.GET.get("page")
+    post_lists = paginator.get_page(page_number)
+
+    ctx = {
+        "title" : "My Liked Post Lists | Blogy",
+        "post_lists": post_lists
+    }
+    
+    return render(request, "post_lists/my_liked_post_lists.html", ctx)
+
+@login_required
 def delete_post_list(request, pk):
     post_list = get_object_or_404(
         PostList,
